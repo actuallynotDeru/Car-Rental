@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const carsSchema = new mongoose.Schema({
 
+    ownerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+    },
+
     name: {
         type: String,
         required: true,
@@ -11,6 +17,17 @@ const carsSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: true,
+    },
+
+    location: {
+        city: String,
+        province: String,
+    },
+
+    carDetails: {
+        modelYear: Number,
+        plateNumber: { type: String, unique: true },
+        mileage: Number,
     },
 
     rating: {

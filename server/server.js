@@ -2,9 +2,9 @@ import express from "express"
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-import userRoutes from "./routes/userRoutes";
-import carRoutes from "./routes/carRoutes";
-import bookingRoutes from "./routes/bookingRoutes";
+import userRoutes from "./routes/userRoutes.js";
+import carRoutes from "./routes/carRoutes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -20,6 +20,6 @@ mongoose.connect(process.env.ATLAS_URI)
   .catch(err => console.error(err));
 
 // start the Express server
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Server listening on port ${process.env.PORT}`);
 });

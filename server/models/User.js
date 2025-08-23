@@ -3,16 +3,11 @@ import mongoose from "mongoose";
 // 1. Define schema
 const userSchema = new mongoose.Schema({
     
-    lname: {
+    fullName: {
         type: String,
         required: true,
-        maxlength: 20,
-    },
-
-    fname: {
-        type: String,
-        required: true,
-        maxlength: 20,
+        maxlength: 100,
+        unique: true,
     },
 
     age: {
@@ -32,7 +27,7 @@ const userSchema = new mongoose.Schema({
         maxlength: 30,
     },
 
-    fulladdress: {
+    fullAddress: {
         type: String,
         required: true,
         maxlength: 50,
@@ -77,14 +72,14 @@ const userSchema = new mongoose.Schema({
         default: Date.now,
     },
 
-    userPass: {
+    password: {
         type: String,
         required: false,
     },
 
     role: {
         type: String,
-        enum: ["Customer", "Admin", "Registrar"],
+        enum: ["Customer", "Admin", "CarOwner", "Registrar"],
         default: "Customer",
     },
 

@@ -1,4 +1,4 @@
-import Car from "../models/Cars";
+import Car from "../models/Cars.js";
 
 //get all cars
 export const getCars = async(req, res) => {
@@ -9,6 +9,16 @@ export const getCars = async(req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
+export const getCarsById = async(req, res) => {
+    try {
+        const cars = await Car.findById(req.params.id);
+        if(!cars) return res.status(404).json({ message: "Car not found" });
+        res.json(cars);
+    } catch(err) {
+        res.status(500).json({ message: err.message });
+    }
+}
 
 //create a car
 export const createCar = async(req, res) => {
