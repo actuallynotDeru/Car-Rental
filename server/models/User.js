@@ -59,7 +59,7 @@ const userSchema = new mongoose.Schema({
     country: {
         type: String,
         required: true,
-        maxlength: 20,
+        maxlength: 50,
     },
 
     phone: {
