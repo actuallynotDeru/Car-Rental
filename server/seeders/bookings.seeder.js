@@ -1,8 +1,8 @@
 import { faker } from "@faker-js/faker";
-import { connectIfNeeded, disconnectIf, pick, randomInt } from "./helpers.js";
 import Booking from "../models/Bookings.js";
-import Car from "../models/Cars.js";
 import User from "../models/User.js";
+import Car from "../models/Cars.js";
+import { connectIfNeeded, disconnectIf, pick, randomInt } from "./helpers.js";
 import { pathToFileURL } from "url";
 
 const BOOKINGS_COUNT = 20;
@@ -50,6 +50,39 @@ export async function seedBookings({ clear = true, cars = null, customers = null
     await disconnectIf(didConnect);
   }
 }
+
+const createBookings = async () => {
+  const customers = await User.find({ role: "Customer" });
+  const carOwners = await User.find({ role: "CarOwner" });
+  const cars = await Car.find();
+
+  if (customers.length === 0 || carOwners.length === 0 || cars.length === 0) {
+    console.log("Insufficient data. Please seed users and cars first.");
+    return;
+  }
+
+  const bookings = [];
+
+  for (let i = 0; i < 10; i++) {
+    const pickupDate = faker.date.future();
+    const returnDate = faker.date.future({ refDate: pickupDate });
+
+    bookings.push({
+      ownerId: faker.helpers.arrayElement(carOwners)._id,
+      customerId: faker.helpers.arrayElement(customers)._id,
+      carId: faker.helpers.arrayElement(cars)._id,
+      pickupDate: pickupDate,
+      returnDate: returnDate,
+      totalPrice: faker.number.int({ min: 100, max: 2000 }),
+      paymentProof: faker.image.url(),
+      status: faker.helpers.arrayElement(["Pending", "Confirmed", "Cancelled", "Completed"]),
+      idPhoto: faker.image.url()
+    });
+  }
+
+  await Booking.insertMany(bookings);
+  console.log("Bookings seeded successfully");
+};
 
 async function main() {
   await seedBookings({ clear: true });

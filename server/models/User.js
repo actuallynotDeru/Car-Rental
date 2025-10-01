@@ -114,11 +114,6 @@ const userSchema = new mongoose.Schema({
         default: null,
     },
 
-    idPhoto: {
-        type: String,
-        default: null,
-    },
-
 }, {timestamps: true});
 
 // 2. Create model (collection name will be 'users')
