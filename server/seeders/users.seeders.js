@@ -1,10 +1,10 @@
-import { faker } from '@faker-js/faker';
-import { connectIfNeeded, disconnectIf, pick, randomInt, truncate } from './helpers.js';
-import User from '../models/User.js';
+import { faker } from "@faker-js/faker";
+import { connectIfNeeded, disconnectIf, pick, randomInt, truncate } from "./helpers.js";
+import User from "../models/User.js";
 import { pathToFileURL } from "url";
 
 const NUM_ADMINS = 1;
-const NUM_CUSTOMERS = 12
+const NUM_CUSTOMERS = 12;
 const NUM_OWNERS = 6;
 
 function makeUser(role = "Customer", overrides = {}) {
@@ -12,7 +12,7 @@ function makeUser(role = "Customer", overrides = {}) {
     const first = faker.person.firstName(gender.toLowerCase());
     const last = faker.person.lastName();
     const fullName = truncate(`${first} ${last}`, 100);
-    const age = randomInt(18, 65)
+    const age = randomInt(18, 65);
     const phone = faker.phone.number();
     const password = null;
     const status = pick(["Verified", "Unverified"]);
@@ -51,25 +51,25 @@ function makeUser(role = "Customer", overrides = {}) {
 export async function seedUsers({ clear = true } = {}) {
     const didConnect = await connectIfNeeded();
     try {
-        if(clear) await User.deleteMany({});
+        if (clear) await User.deleteMany({});
         const desired = [
             ...Array.from({ length: NUM_ADMINS }, () => makeUser("Admin", { status: "Verified" })),
             ...Array.from({ length: NUM_OWNERS }, () => makeUser("CarOwner")),
-            ...Array.from({ length: NUM_CUSTOMERS}, () => makeUser("Customer")),
+            ...Array.from({ length: NUM_CUSTOMERS }, () => makeUser("Customer")),
         ];
 
         const seen = new Set();
         const users = [];
-        for(const u of desired) {
-            if(seen.has(u.fullName)) continue;
+        for (const u of desired) {
+            if (seen.has(u.fullName)) continue;
             seen.add(u.fullName);
             users.push(u);
         }
 
-        while(users.length < desired.length) {
+        while (users.length < desired.length) {
             const role = users.length < NUM_ADMINS ? "Admin" : users.length < NUM_ADMINS + NUM_OWNERS ? "CarOwner" : "Customer";
             const u = makeUser(role);
-            if(!seen.has(u.fullName)) {
+            if (!seen.has(u.fullName)) {
                 seen.add(u.fullName);
                 users.push(u);
             }
@@ -83,8 +83,36 @@ export async function seedUsers({ clear = true } = {}) {
     }
 }
 
+const createUsers = async () => {
+    const users = [];
+
+    for (let i = 0; i < 20; i++) {
+        users.push({
+            fullName: faker.person.fullName(),
+            age: faker.number.int({ min: 18, max: 70 }),
+            gender: faker.person.sex(),
+            email: faker.internet.email(),
+            fullAddress: faker.location.streetAddress(),
+            province: faker.location.state(),
+            street: faker.location.street(),
+            zip: faker.number.int({ min: 10000, max: 99999 }),
+            city: faker.location.city(),
+            country: faker.location.country(),
+            phone: faker.phone.number(),
+            password: faker.internet.password(),
+            role: faker.helpers.arrayElement(["Customer", "Admin", "CarOwner", "Registrar"]),
+            status: faker.helpers.arrayElement(["Verified", "Unverified"]),
+            failedAttempts: faker.number.int({ min: 0, max: 5 }),
+            selfiePhoto: faker.image.avatar(),
+        });
+    }
+
+    await User.insertMany(users);
+    console.log("Users seeded successfully");
+};
+
 async function main() {
     await seedUsers({ clear: true });
 }
 const isDirect = pathToFileURL(process.argv[1]).href === import.meta.url;
-if (isDirect) main().catch(e => { console.error(e); process.exit(1); });
+if (isDirect) main().catch((e) => { console.error(e); process.exit(1); });

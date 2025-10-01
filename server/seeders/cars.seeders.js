@@ -1,8 +1,8 @@
 import { faker } from "@faker-js/faker";
 import { connectIfNeeded, disconnectIf, pick, randomInt } from "./helpers.js";
+import { pathToFileURL } from "url";
 import Car from "../models/Cars.js";
 import User from "../models/User.js";
-import { pathToFileURL } from "url";
 
 const CARS_PER_OWNER_MIN = 1;
 const CARS_PER_OWNER_MAX = 4;
@@ -16,16 +16,13 @@ function makeCar(owner, plate) {
     ownerId: owner._id,
     name: `${pick(["Toyota","Honda","Ford","Chevrolet","Nissan","Hyundai","Kia","BMW","Audi","Mercedes"])} ${pick(["Sedan","Hatchback","SUV","Pickup","Coupe","Van"])}`,
     price: randomInt(1200, 6000),
-    location: { city: owner.city || faker.location.city(), province: owner.province || faker.location.state() },
     carDetails: {
-      modelYear: randomInt(2008, 2024),
+      seats: randomInt(2, 8),
+      transmission: pick(["Automatic", "Manual"]),
+      fuelType: pick(["Gasoline", "Diesel", "Electric", "Hybrid"]),
       plateNumber: plate,
-      mileage: randomInt(1000, 180000),
     },
     rating: Number((Math.random() * 1.5 + 3.5).toFixed(1)),
-    seats: randomInt(2, 8),
-    transmission: pick(["Automatic", "Manual"]),
-    fuelType: pick(["Gasoline", "Diesel", "Electric", "Hybrid"]),
     image: faker.image.url(),
     status: pick(["Available", "Unavailable"]),
   };

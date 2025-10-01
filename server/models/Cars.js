@@ -19,15 +19,29 @@ const carsSchema = new mongoose.Schema({
         required: true,
     },
 
-    location: {
-        city: String,
-        province: String,
-    },
-
     carDetails: {
-        modelYear: Number,
-        plateNumber: { type: String, unique: true },
-        mileage: Number,
+        seats: {
+            type: Number,
+            required: true
+        },
+
+        transmission: {
+            type: String,
+            required: true,
+            maxlength: 50,
+        },
+
+        fuelType: {
+            type: String,
+            required: true,
+            maxlength: 50,
+        },
+
+        plateNumber: {
+            type: String,
+            required: true,
+            maxlength: 20,
+        }
     },
 
     rating: {
@@ -35,23 +49,6 @@ const carsSchema = new mongoose.Schema({
         default: 5.0,
         max: 5,
         min: 0,
-    },
-
-    seats: {
-        type: Number,
-        required: true
-    },
-
-    transmission: {
-        type: String,
-        required: true,
-        maxlength: 50,
-    },
-
-    fuelType: {
-        type: String,
-        required: true,
-        maxlength: 50,
     },
 
     image: {

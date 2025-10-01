@@ -30,11 +30,6 @@ const bookingSchema = new mongoose.Schema({
         required: false,
     },
 
-    pickupLocation: {
-        type: String,
-        required: false,
-    },
-
     totalPrice: {
         type: Number,
         required: false,
@@ -49,6 +44,11 @@ const bookingSchema = new mongoose.Schema({
         type: String,
         enum: ["Pending", "Confirmed", "Cancelled", "Completed"],
         required: false,
+    },
+
+    idPhoto: {
+        type: String,
+        default: null,
     },
 
 }, {timestamps: true});
