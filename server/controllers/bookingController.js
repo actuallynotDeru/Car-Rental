@@ -3,7 +3,10 @@ import Booking from "../models/Bookings.js";
 //get all bookings
 export const getBookings = async(req, res) => {
     try {
-        const bookings = await Booking.find().populate("customer car");
+        const bookings = await Booking.find()
+        .populate("ownerId")
+        .populate("customerId")
+        .populate("carId")
         res.json(bookings);
     } catch(err) {
         res.status(500).json({ message: err.message });
