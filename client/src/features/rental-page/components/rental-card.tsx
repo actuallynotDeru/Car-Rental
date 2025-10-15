@@ -1,4 +1,4 @@
-import { Star, Users, Settings, Zap } from "lucide-react";
+import { Star, Users, Settings, Zap, Fuel } from "lucide-react";
 
 interface RentalCardProps {
     imgSrc: string;
@@ -52,7 +52,7 @@ const RentalCard = ({imgSrc, imgAlt, carName, rating, price, seats, transmission
                     </div>
 
                     <div className="flex items-center gap-1">
-                        <Zap size={16} /> <span>{type}</span>
+                        <Fuel size={16} /> <span>{type}</span>
                     </div>
                 </div>
 

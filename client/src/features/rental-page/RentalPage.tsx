@@ -1,7 +1,9 @@
 import Header from "@/components/Header";
+import RentalCard from "./components/rental-card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Calendar, SearchIcon } from "lucide-react";
-import RentalCard from "./components/rental-card";
 
 const RentalPage = () => {
     return(
@@ -33,99 +35,99 @@ const RentalPage = () => {
                 <div className = "w-1/4 flex flex-col space-y-4">
 
                 {/* Category Box */}
-                    <div className = "border border-black rounded-lg p-4 mb-4 space-y-4">
+                    <div className = "rounded-lg p-4 mb-4 space-y-4 bg-white shadow-lg">
                         <div className = "flex flex-col items-center space-y-2">
                             <h1 className = "text-4xl font-semibold">Categories</h1>
                             <hr className = "w-11/12 border-t-2 border-black"/>
                         </div>
 
-                        <div className= "text-lg px-4">
-                            <div className = "space-x-4">
-                                <input type="checkbox" id="required" name="required"/>
-                                <label>This field is required*</label>
+                        <div className= "px-4 space-y-4">
+                            <div className = "flex items-center gap-3">
+                                <Checkbox className = "border-2 border-gray-700 data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-900 text-white"/>
+                                <Label>This field is required*</Label>
                             </div>
 
-                            <div className = "space-x-4">
-                                <input type="checkbox" id="required" name="required"/>
-                                <label>This field is required*</label> 
+                            <div className = "flex items-center gap-3">
+                                <Checkbox className = "border-2 border-gray-700 data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-900 text-white"/>
+                                <Label>This field is required*</Label> 
                             </div>
 
-                            <div className = "space-x-4">
-                                <input type="checkbox" id="required" name="required"/>
-                                <label>This field is required*</label>
+                            <div className = "flex items-center gap-3">
+                                <Checkbox className = "border-2 border-gray-700 data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-900 text-white"/>
+                                <Label>This field is required*</Label>
                             </div>
 
-                            <div className = "space-x-4">
-                                <input type="checkbox" id="required" name="required"/>
-                                <label>This field is required*</label>
+                            <div className = "flex items-center gap-3">
+                                <Checkbox className = "border-2 border-gray-700 data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-900 text-white"/>
+                                <Label>This field is required*</Label>
                             </div>
 
-                            <div className = "space-x-4">
-                                <input type="checkbox" id="required" name="required"/>
-                                <label>This field is required*</label>
+                            <div className = "flex items-center gap-3">
+                                <Checkbox className = "border-2 border-gray-700 data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-900 text-white"/>
+                                <Label>This field is required*</Label>
                             </div>
 
-                            <div className = "space-x-4">
-                                <input type="checkbox" id="required" name="required"/>
-                                <label>This field is required*</label>
+                            <div className = "flex items-center gap-3">
+                                <Checkbox className = "border-2 border-gray-700 data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-900 text-white"/>
+                                <Label>This field is required*</Label>
                             </div>
                         </div>
                     </div>
 
                     {/* Filters Box */}
-                    <div className = "border border-black rounded-lg p-4 mb-4 space-y-4">
+                    <div className = "rounded-lg p-4 mb-4 space-y-4 bg-white shadow-lg">
                         <div className = "flex flex-col items-center space-y-2">
                             <h1 className = "text-4xl font-semibold">Filters</h1>
                             <hr className = "w-11/12 border-t-2 border-black"/>
                         </div>
 
                         <div className= "text-lg space-y-4 px-4">
-                            <div>
+                            <div className = "space-y-2">
                                 <h3 className = "text-xl font-semibold">Fuel Type</h3>
-                                <div className = "space-x-4">
-                                    <input type="checkbox" id="required" name="required"/>
-                                    <label>Gas</label>
+                                <div className = "flex items-center gap-3">
+                                    <Checkbox className = "border-2 border-gray-700 data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-900 text-white"/>
+                                    <Label>Gas</Label>
                                 </div>
 
-                                <div className = "space-x-4">
-                                    <input type="checkbox" id="required" name="required"/>
-                                    <label>Electric</label> 
+                                <div className = "flex items-center gap-3">
+                                    <Checkbox className = "border-2 border-gray-700 data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-900 text-white"/>
+                                    <Label>Electric</Label> 
                                 </div>
                             </div>
 
-                            <div>
+                            <div className = "space-y-2">
                                 <h3 className = "text-xl font-semibold">Price</h3>
-                                <div className = "space-x-4">
-                                    <input type="checkbox" id="required" name="required"/>
-                                    <label>0-999</label>
+                                <div className = "flex items-center gap-3">
+                                    <Checkbox className = "border-2 border-gray-700 data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-900 text-white"/>
+                                    <Label>0-999</Label>
                                 </div>
 
-                                <div className = "space-x-4">
-                                    <input type="checkbox" id="required" name="required"/>
-                                    <label>1000-1999</label>
+                                <div className = "flex items-center gap-3">
+                                    <Checkbox className = "border-2 border-gray-700 data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-900 text-white"/>
+                                    <Label>1000-1999</Label>
                                 </div>
 
-                                <div className = "space-x-4">
-                                    <input type="checkbox" id="required" name="required"/>
-                                    <label>2000-2999</label>
+                                <div className = "flex items-center gap-3">
+                                    <Checkbox className = "border-2 border-gray-700 data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-900 text-white"/>
+                                    <Label>2000-2999</Label>
                                 </div>
 
-                                <div className = "space-x-4">
-                                    <input type="checkbox" id="required" name="required"/>
-                                    <label>3000+</label>
+                                <div className = "flex items-center gap-3">
+                                    <Checkbox className = "border-2 border-gray-700 data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-900 text-white"/>
+                                    <Label>3000+</Label>
                                 </div>
                             </div>
 
-                            <div>
+                            <div className = "space-y-2">
                                 <h3 className = "text-xl font-semibold">Transmission</h3>
-                                <div className = "space-x-4">
-                                    <input type="checkbox" id="required" name="required"/>
-                                    <label>Manual</label>
+                                <div className = "flex items-center gap-3">
+                                    <Checkbox className = "border-2 border-gray-700 data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-900 text-white"/>
+                                    <Label>Manual</Label>
                                 </div>
 
-                                <div className = "space-x-4">
-                                    <input type="checkbox" id="required" name="required"/>
-                                    <label>Automatic</label>
+                                <div className = "flex items-center gap-3">
+                                    <Checkbox className = "border-2 border-gray-700 data-[state=checked]:bg-gray-800 data-[state=checked]:border-gray-900 text-white"/>
+                                    <Label>Automatic</Label>
                                 </div>
                             </div>
                         </div>
