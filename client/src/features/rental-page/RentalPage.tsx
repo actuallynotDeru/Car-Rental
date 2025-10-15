@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Calendar, SearchIcon } from "lucide-react";
+import RentalCard from "./components/rental-card";
 
 const RentalPage = () => {
     return(
@@ -35,7 +36,7 @@ const RentalPage = () => {
                     <div className = "border border-black rounded-lg p-4 mb-4 space-y-4">
                         <div className = "flex flex-col items-center space-y-2">
                             <h1 className = "text-4xl font-semibold">Categories</h1>
-                            <hr className = "w-11/12"/>
+                            <hr className = "w-11/12 border-t-2 border-black"/>
                         </div>
 
                         <div className= "text-lg px-4">
@@ -75,7 +76,7 @@ const RentalPage = () => {
                     <div className = "border border-black rounded-lg p-4 mb-4 space-y-4">
                         <div className = "flex flex-col items-center space-y-2">
                             <h1 className = "text-4xl font-semibold">Filters</h1>
-                            <hr className = "w-11/12"/>
+                            <hr className = "w-11/12 border-t-2 border-black"/>
                         </div>
 
                         <div className= "text-lg space-y-4 px-4">
@@ -127,20 +128,15 @@ const RentalPage = () => {
                                     <label>Automatic</label>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
 
             {/* Right Side */}
-                <div className = "w-full space-y-12">
-                    <div className = "flex flex-col items-center">
-                        <h2 className = "text-3xl font-bold mb-2">Our Fleet</h2>
-                        {/* <div className = "w-7/12 border-0 rounded-lg flex space-x-4 py-2 px-4 bg-white">
-                            <Search />
-                            <input type = "text" placeholder = "Search" className = "w-full" />
-                        </div> */}
-                        <InputGroup>
+                <div className = "w-full space-y-24">
+                    <div className = "flex flex-col items-center space-y-4">
+                        <h2 className = "text-3xl font-bold">Our Fleet</h2>
+                        <InputGroup className = "bg-white w-10/12">
                             <InputGroupInput placeholder = "Search"/>
                             <InputGroupAddon>
                                 <SearchIcon />
@@ -148,10 +144,21 @@ const RentalPage = () => {
                         </InputGroup>
                     </div>
 
-                    <div className="grid grid-cols-3">
+                    <div className="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-12">
                         {/* Cards */}
 
-                        test
+                        {[...Array(5)].map(() => (
+                            <RentalCard 
+                                imgSrc = "https://static-assets.tesla.com/configurator/compositor?context=design_studio_2?&bkba_opt=1&view=STUD_3QTR&size=600&model=my&options=$APBS,$IPB7,$PPSW,$SC04,$MDLY,$WY19P,$MTY46,$STY5S,$CPF0&crop=1150,647,390,180&2"
+                                carName = "2024 Tesla Model"
+                                rating = {4.6}
+                                price = {1200}
+                                seats = {5}
+                                transmission = "Automatic"
+                                type = "Electric"
+                            />
+                        ))}
+
                     </div>
                 </div>
             </div>
