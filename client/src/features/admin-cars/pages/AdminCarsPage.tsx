@@ -1,13 +1,15 @@
+// filepath: c:\Users\Simon Gabriel\Desktop\COLLEGE\SCHOOL\WEBDEV-2\FINAL-PROJECT\Car-Rental\client\src\features\admin-cars\pages\AdminCarsPage.tsx
 "use client"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { mockCars } from "@/lib/mock-data"
-import { Edit2, Trash2, Plus, X } from "lucide-react"
+import { Plus, X } from "lucide-react"
 import { useState, useMemo } from "react"
 import { Label } from "@/components/ui/label"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import { Carcolumns } from "../components/cars-columns"
+import { CarsDataTable } from "../components/cars-data-table"
 
 export default function CarsPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -81,7 +83,7 @@ export default function CarsPage() {
                         </div>
 
                         <div className="min-w-[150px]">
-                            <label className="text-sm font-medium text-foreground mb-1 block">Transmission</label>
+                            <Label className="text-sm font-medium text-foreground mb-1 block">Transmission</Label>
                             <select
                                 value={filters.transmission}
                                 onChange={(e) => handleFilterChange("transmission", e.target.value)}
@@ -94,7 +96,7 @@ export default function CarsPage() {
                         </div>
 
                         <div className="min-w-[150px]">
-                            <label className="text-sm font-medium text-foreground mb-1 block">Fuel Type</label>
+                            <Label className="text-sm font-medium text-foreground mb-1 block">Fuel Type</Label>
                             <select
                                 value={filters.fuelType}
                                 onChange={(e) => handleFilterChange("fuelType", e.target.value)}
@@ -118,69 +120,7 @@ export default function CarsPage() {
                 </div>
             </Card>
 
-            <Card className="overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead>
-                            <tr className="border-b border-border bg-muted">
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Car Name</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Seats</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Transmission</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Fuel Type</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Plate Number</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Price/Day</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Rating</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Status</th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredCars.length > 0 ? (
-                                filteredCars.map((car) => (
-                                <tr key={car.id} className="border-b border-border hover:bg-muted/50 transition-colors">
-                                    <td className="px-6 py-4 text-sm text-foreground">{car.name}</td>
-                                    <td className="px-6 py-4 text-sm text-foreground">{car.carDetails.seats}</td>
-                                    <td className="px-6 py-4 text-sm text-foreground">{car.carDetails.transmission}</td>
-                                    <td className="px-6 py-4 text-sm text-foreground">{car.carDetails.fuelType}</td>
-                                    <td className="px-6 py-4 text-sm text-foreground">{car.carDetails.plateNumber}</td>
-                                    <td className="px-6 py-4 text-sm text-foreground">${car.price}</td>
-                                    <td className="px-6 py-4 text-sm text-foreground">⭐ {car.rating}</td>
-                                    <td className="px-6 py-4 text-sm">
-                                        <span
-                                            className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                            car.status === "Available" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                                            }`}
-                                        >
-                                            {car.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm">
-                                        <div className="flex gap-2">
-                                            <Button variant="ghost" size="sm">
-                                                <Edit2 className="w-4 h-4" />
-                                            </Button>
-                                            <Button variant="ghost" size="sm" className="text-destructive">
-                                                <Trash2 className="w-4 h-4" />
-                                            </Button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={9} className="h-24 text-center text-muted-foreground">
-                                        No cars found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </Card>
-
-            <div className="mt-4 text-sm text-muted-foreground">
-                Showing {filteredCars.length} of {mockCars.length} cars
-            </div>
+            <CarsDataTable columns={Carcolumns} data={filteredCars} />
         </div>
   )
 }
