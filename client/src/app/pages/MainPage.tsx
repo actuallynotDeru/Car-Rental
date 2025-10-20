@@ -1,9 +1,9 @@
-
+import Main from "../../features/main-page/MainPage.tsx"
 
 const MainPage = () => {
     return (
         <p>
-            This is the main page 
+            <Main />
         </p>
     )
 }
