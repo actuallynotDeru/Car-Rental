@@ -4,6 +4,7 @@ import MainPage from './pages/MainPage'
 import Rental from './pages/Rental'
 import AdminPage from './pages/AdminDashboard'
 import AdminLayout from './layout/adminLayout'
+import AdminCars from './pages/AdminCars'
 
 export default function AppRouter() {
     return (
@@ -27,6 +28,15 @@ export default function AppRouter() {
                 element = {
                     <AdminLayout>
                         <AdminPage />
+                    </AdminLayout>
+                }
+            />
+
+            <Route 
+                path = "/admin/cars"
+                element = {
+                    <AdminLayout>
+                        <AdminCars />
                     </AdminLayout>
                 }
             />
