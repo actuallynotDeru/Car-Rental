@@ -58,7 +58,7 @@ export const Carcolumns: ColumnDef<Car>[] = [
     id: "actions",
     header: "Actions",
     cell: ({ row }) => (
-      <div className="flex items-center gap-2">
+      <div key = {row.id} className="flex items-center gap-2">
         <Button variant="ghost" size="sm">
           <Edit2 className="w-4 h-4" />
         </Button>

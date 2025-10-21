@@ -13,3 +13,11 @@ export interface Car {
     rating: number
     status: string
 }
+
+export interface User {
+    id: string
+    fullName: string
+    email: string
+    role: string
+    status: string
+}

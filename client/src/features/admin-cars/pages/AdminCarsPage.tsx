@@ -1,6 +1,3 @@
-// filepath: c:\Users\Simon Gabriel\Desktop\COLLEGE\SCHOOL\WEBDEV-2\FINAL-PROJECT\Car-Rental\client\src\features\admin-cars\pages\AdminCarsPage.tsx
-"use client"
-
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -45,7 +42,7 @@ export default function CarsPage() {
   const hasActiveFilters = searchTerm || Object.values(filters).some((v) => v)
 
   return (
-        <div className="flex-1 overflow-auto p-8">
+        <div className="flex-1 overflow-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-2">Cars Management</h1>

@@ -1,6 +1,3 @@
-// ...existing code...
-"use client"
-
 import { useState } from "react"
 import {
   type ColumnDef,
@@ -120,7 +117,6 @@ export function CarsDataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {/* ...existing code... */}
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow

@@ -65,7 +65,10 @@ const userNavigation: NavigationType[] = [
     name: 'Users',
     href: 'users',
     icon: Users,
-    submenu: [{ name: 'All Users', href: '/admin/users' }],
+    submenu: [
+      { name: 'All Users', href: '/admin/users' },
+      { name: 'Applications', href: '/admin/application '}
+    ],
   },
 ];
 
