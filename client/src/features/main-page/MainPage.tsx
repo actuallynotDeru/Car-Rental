@@ -1,16 +1,18 @@
 
-import carImg from "../../assets/carimg.jpg";
+import carImg from "../../assets/carimg.jpg"
+import vector_img1 from "../../assets/vector_img1.svg"
+import vector_img2 from "../../assets/vector_img2.svg"
 import { Calendar, Search, CircleCheckBig, Key } from "lucide-react"
 const MainPage = () => {
     return(
         <>
         {/* Hero Image */}
-        <div className="relative w-full overflow-x-hidden">
+        <div className="relative w-full h-screen overflow-hidden">
             <img src={carImg} alt="Car Image"
-            className="w-[1658px] h-auto scale-125" />
+            className="w-full h-full object-cover transform scale-125" />
+            <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />
         </div>
         
-        <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />
 
         {/*Transparent Header*/}
         <div className="absolute top-0 left-0 w-full flex justify-between py-4 text-white bg-transparent">
@@ -96,9 +98,42 @@ const MainPage = () => {
             </div>
         </div>
 
-        {/*Explore Cebu Your Way */}
-        <div className="w-auto h-[440px] bg-[#F2F2F2] flex">
+        {/*Explore cebu your way */}
+        <div className="w-auto h-[450px] bg-[#F2F2F2] flex justify-center">
+            <img src={vector_img1} className="w-[450px] h-[450px]" ></img>
 
+            <div className="flex flex-col justify-center px-10">
+                <div className="flex flex-col h-auto w-[400px] justify-center gap-3">
+                    <h1 className="font-semibold text-3xl">Explore Cebu <span className="text-[#1591EA]">Your Way</span></h1>
+                    <p className="text-lg">Discover freedom on Cebu’s road with Eehway’s diverse 
+                        car selection. Whether it’s a weekend escape or a 
+                        daily drive, we’ve got the ride for you.</p>
+                </div>
+                <button className="bg-[#1591EA] mt-5 text-white h-[35px] w-[100px] flex items-center justify-center gap-5
+                rounded-[8px]">
+                    Search Car
+                </button>
+            </div>
+        </div>
+        {/* Share the Drive */}
+        
+        <div className="w-auto h-[500px] pt-5 bg-[#F2F2F2] flex justify-center">
+
+            {/* text */} 
+            <div className="flex flex-col justify-center px-10">
+                <div className="flex flex-col h-auto w-[400px] justify-center gap-3">
+                    <h1 className="font-semibold text-3xl"><span className="text-[#1591EA]">Share </span>The Drive</h1>
+                    <p className="text-lg">Discover freedom on Cebu’s road with Eehway’s diverse 
+                        car selection. Whether it’s a weekend escape or a 
+                        daily drive, we’ve got the ride for you.</p>
+                </div>
+                <button className="bg-[#1591EA] mt-5 text-white h-[35px] w-[120px] flex items-center justify-center gap-5
+                rounded-[8px]">
+                    List Your Car
+                </button>
+            </div>
+
+            <img src={vector_img2} className="w-[450px] h-[450px]"></img>
         </div>
 
         
