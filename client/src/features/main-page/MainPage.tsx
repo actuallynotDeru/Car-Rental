@@ -1,11 +1,11 @@
 
 import carImg from "../../assets/carimg.jpg";
-import { Calendar, Search } from "lucide-react"
+import { Calendar, Search, CircleCheckBig, Key } from "lucide-react"
 const MainPage = () => {
     return(
         <>
         {/* Hero Image */}
-        <div className="relative w-full">
+        <div className="relative w-full overflow-x-hidden">
             <img src={carImg} alt="Car Image"
             className="w-[1658px] h-auto scale-125" />
         </div>
@@ -50,7 +50,7 @@ const MainPage = () => {
                 </div>
                 <div className="flex items-center w-[200px] h-[50px] border-l px-2.5">
                     <Calendar color="#1591EA" size={36}/>
-                    <p className="px-2 text-">End Date</p>
+                    <p className="px-2">End Date</p>
                 </div>
                 <button className="bg-[#1591EA] h-[50px] w-[200px] flex items-center justify-center gap-5
                 rounded-[8px]">
@@ -61,6 +61,46 @@ const MainPage = () => {
 
         {/*Divider*/}
         <div className="w-auto h-[270px]"></div>
+
+
+
+        {/* How does it work? */}
+        <div className="w-auto h-[440px] bg-[#F2F2F2] flex flex-col items-center py-[25px]
+                        gap-[35px]">
+            <p className="font-semibold text-5xl">
+                <span className="text-[#1591EA]">How </span>does it work?
+            </p>
+
+            {/* Steps */}
+            <div className="w-[1100px] h-[250px] flex justify-between">
+                <div className="w-[250px] h-[230px] bg-[#FFFFFF] rounded-[16px] shadow-lg flex
+                                flex-col justify-center items-center">
+                <Search color="#1591EA" size={60}/> <p className="text-2xl font-semibold">Browse & Select</p>
+                <p className="w-[200px] text-center"> Lorem Ipsum DOLOR LALALALALALLALALALAL</p>
+                </div>
+                <div className="w-[250px] h-[230px] bg-[#FFFFFF] rounded-[16px] shadow-lg flex
+                                flex-col justify-center items-center">
+                <Calendar color="#1591EA" size={60}/> <p className="text-2xl font-semibold">Pick Your Dates</p>
+                <p className="w-[200px] text-center"> Lorem Ipsum DOLOR LALALALALALLALALALAL</p>
+                </div>
+                <div className="w-[250px] h-[230px] bg-[#FFFFFF] rounded-[16px] shadow-lg flex
+                                flex-col justify-center items-center">
+                <CircleCheckBig color="#1591EA" size={60}/> <p className="text-2xl font-semibold">Book & Pay</p>
+                <p className="w-[200px] text-center"> Lorem Ipsum DOLOR LALALALALALLALALALAL</p>
+                </div>
+                <div className="w-[250px] h-[230px] bg-[#FFFFFF] rounded-[16px] shadow-lg flex
+                                flex-col justify-center items-center">
+                <Key color="#1591EA" size={60}/> <p className="text-2xl font-semibold">Book & Pay</p>
+                <p className="w-[200px] text-center"> Lorem Ipsum DOLOR LALALALALALLALALALAL</p>
+                </div>
+            </div>
+        </div>
+
+        {/*Explore Cebu Your Way */}
+        <div className="w-auto h-[440px] bg-[#F2F2F2] flex">
+
+        </div>
+
         
 
 
