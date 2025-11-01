@@ -2,6 +2,7 @@
 import carImg from "../../assets/carimg.jpg"
 import vector_img1 from "../../assets/vector_img1.svg"
 import vector_img2 from "../../assets/vector_img2.svg"
+import ReviewCard from "./components/ReviewCard.tsx"
 import { Calendar, Search, CircleCheckBig, Key } from "lucide-react"
 const MainPage = () => {
     return(
@@ -136,7 +137,49 @@ const MainPage = () => {
             <img src={vector_img2} className="w-[450px] h-[450px]"></img>
         </div>
 
-        
+        {/* Why choose Eehway */}
+        <div className="w-full h-[270px] flex flex-col justify-center items-center bg-[#F2F2F2] gap-[25px]">
+            <p className="text-5xl font-semibold text-center">
+                <span className="text-[#1591EA]">Why </span> choose <span className="text-[#0D3B66]">Eehway?</span>
+            </p>
+
+            <div className="flex flex-col justify-center items-center w-auto text-center gap-2.5">
+                <h2 className="text-4xl font-medium">
+                We prioritize reliability, safety, and comfort.
+                </h2>
+                <p className="w-[620px] text-[#8D8D8D]">
+                At Eehway Transport, we make car rental simple, affordable, and reliable.
+                Whether you’re traveling for business or leisure, our well-maintained
+                vehicles and smooth booking process ensure a hassle-free experience
+                every time.
+                </p>
+            </div>
+        </div>
+
+        {/* what our customers say */}
+        <div className="flex flex-col justify-center bg-[#F2F2F2] items-center gap-8 h-[600px]">
+            <p className="text-5xl font-semibold text-center ">
+                <span className="text-[#1591EA]">What </span>our customers say
+            </p>
+            <div className="flex gap-7">
+                <ReviewCard
+                    message="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+                    name="Jane Doe"
+                />
+                <ReviewCard
+                    message="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+                    name="Jane Doe"
+                />
+                <ReviewCard
+                    message="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+                    name="Jane Doe"
+                />
+            </div>
+        </div>
+
+        <div className="w-auto h-[100px] bg-[#1591EA]">
+            <p className="text-center text-white">Footer</p>
+        </div>
 
 
         </>
