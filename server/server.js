@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes.js";
 import carRoutes from "./routes/carRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
+import carOwnerApplicationRoutes from "./routes/carOwnerApplicationRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/cars", carRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/car-owner-applications", carOwnerApplicationRoutes);
 
 mongoose.connect(process.env.ATLAS_URI)
   .then(() => console.log("MongoDB connected"))
