@@ -2,6 +2,11 @@ import { Routes, Route} from 'react-router-dom'
 
 import MainPage from './pages/MainPage'
 import Rental from './pages/Rental'
+import AdminPage from './pages/AdminDashboard'
+import AdminLayout from './layout/adminLayout'
+import AdminCars from './pages/AdminCars'
+import AdminUsersPage from './pages/AdminUsers'
+import AdminBookings from './pages/AdminBookings'
 
 export default function AppRouter() {
     return (
@@ -17,6 +22,42 @@ export default function AppRouter() {
                 path = "/rental"
                 element = {
                     <Rental />
+                }
+            />
+
+            <Route 
+                path = "/admin"
+                element = {
+                    <AdminLayout>
+                        <AdminPage />
+                    </AdminLayout>
+                }
+            />
+
+            <Route 
+                path = "/admin/cars"
+                element = {
+                    <AdminLayout>
+                        <AdminCars />
+                    </AdminLayout>
+                }
+            />
+
+            <Route 
+                path = "/admin/users"
+                element = {
+                    <AdminLayout>
+                        <AdminUsersPage />
+                    </AdminLayout>
+                }
+            />
+
+            <Route 
+                path = "/admin/bookings"
+                element = {
+                    <AdminLayout>
+                        <AdminBookings />
+                    </AdminLayout>
                 }
             />
         </Routes>
