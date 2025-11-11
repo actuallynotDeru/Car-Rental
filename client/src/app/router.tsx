@@ -8,6 +8,7 @@ import AdminCars from './pages/AdminCars'
 import AdminUsersPage from './pages/AdminUsers'
 import AdminBookings from './pages/AdminBookings'
 import AdminUserApplication from './pages/AdminUserApplication'
+import Products from './pages/ProductPage'
 
 export default function AppRouter() {
     return (
@@ -70,6 +71,17 @@ export default function AppRouter() {
                     </AdminLayout>
                 }
             />
+            
+            <Route 
+                path = "/products"
+                element = {
+                    <Products />
+                }
+            />
+
         </Routes>
+        
+
+            
     )
 }

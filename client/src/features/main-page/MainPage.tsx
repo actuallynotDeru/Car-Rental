@@ -1,4 +1,3 @@
-
 import carImg from "../../assets/carimg.jpg"
 import vector_img1 from "../../assets/vector_img1.svg"
 import vector_img2 from "../../assets/vector_img2.svg"
