@@ -3,31 +3,24 @@ import { bookingColumns, type BookingTableRow } from "./components/bookings-colu
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { mockBookings, mockCars, mockUsers } from "@/lib/mock-data"
+import { mockBookings} from "@/lib/mock-data"
 import { X } from "lucide-react"
 import { useState, useMemo } from "react"
 import { Label } from "@/components/ui/label"
-
-const getCarName = (carId: string) => {
-    return mockCars.find((c) => c.id === carId)?.name || "Unknown"
-}
-
-const getCustomerName = (customerId: string) => {
-    return mockUsers.find((u) => u.id === customerId)?.fullName || "Unknown"
-}
-
-const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-    })
-}
+import { 
+    Select, 
+    SelectTrigger, 
+    SelectValue, 
+    SelectContent, 
+    SelectItem 
+} from "@/components/ui/select"
+import { formatDate } from "./utils/format"
+import { getCarName, getCustomerName } from "./utils/get"
 
 const AdminBookingPage = () => {
     const [searchTerm, setSearchTerm] = useState("")
     const [filters, setFilters] = useState({
-        status: "",
+        status: "all",
     })
 
     const filteredBookings = useMemo(() => {
@@ -36,7 +29,7 @@ const AdminBookingPage = () => {
                 booking.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 getCustomerName(booking.customerId).toLowerCase().includes(searchTerm.toLowerCase()) ||
                 getCarName(booking.carId).toLowerCase().includes(searchTerm.toLowerCase())
-            const matchesStatus = !filters.status || booking.status === filters.status
+            const matchesStatus = filters.status === "all" || booking.status === filters.status
 
             return matchesSearch && matchesStatus
         })
@@ -60,13 +53,13 @@ const AdminBookingPage = () => {
     }
 
     const clearFilters = () => {
-        setSearchTerm(""),
+        setSearchTerm("")
         setFilters({
-            status: ""
+            status: "all"
         })
     }
 
-    const hasActiveFilters = searchTerm || Object.values(filters).some((v) => v)
+    const hasActiveFilters = searchTerm || Object.values(filters).some((v) => v !== "all")
 
     return(
         <>
@@ -90,17 +83,18 @@ const AdminBookingPage = () => {
 
                             <div className = "min-w-[150px]">
                                 <Label className = "text-sm font-medium text-foreground mb-1 block">Status</Label>
-                                <select
-                                    value = {filters.status}
-                                    onChange = {(e) => handleFilterChange("status", e.target.value)}
-                                    className = "w-full px-3 p-2 border border-input rounded-md bg-background text-foreground text-sm"
-                                >
-                                    <option value="">All</option>
-                                    <option value="Pending">Pending</option>
-                                    <option value="Confirmed">Confirmed</option>
-                                    <option value="Completed">Completed</option>
-                                    <option value="Cancelled">Cancelled</option>
-                                </select>
+                                <Select value = {filters.status} onValueChange = {(e) => handleFilterChange("status", e)}>
+                                    <SelectTrigger className = "w-full">
+                                        <SelectValue placeholder = "All" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value = "all">All</SelectItem>
+                                        <SelectItem value = "Pending">Pending</SelectItem>
+                                        <SelectItem value = "Confirmed">Confirmed</SelectItem>
+                                        <SelectItem value = "Completed">Completed</SelectItem>
+                                        <SelectItem value = "Cancelled">Cancelled</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
 
                             {hasActiveFilters && (

@@ -1,0 +1,150 @@
+import { useState, useMemo } from "react"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { mockCarOwnerApplications } from "@/lib/mock-data"
+import { CheckCircle, XCircle, Clock } from "lucide-react"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import ApplicationsTable from "./components/application-data-table"
+import { getStatusColor, getStatusIcon } from "./utils/get"
+import RenderDialogContent from "./components/modal-content"
+
+const AdminUserApplicationPage = () => {
+  const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState<string>("All")
+  const [sortBy, setSortBy] = useState<string>("newest")
+
+  const filteredApplications = useMemo(() => {
+    const filtered = mockCarOwnerApplications.filter((app) => {
+      const matchesSearch =
+       app.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       app.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       app.businessEmail.toLowerCase().includes(searchTerm.toLowerCase())
+
+      const matchesStatus = statusFilter === "All" || app.status === statusFilter
+      
+      return matchesSearch && matchesStatus
+    })
+
+    if(sortBy === "newest") {
+      filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    } else if(sortBy === "oldest") {
+      filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+    }
+    return filtered
+  }, [searchTerm, statusFilter, sortBy])
+
+  const pendingCount = mockCarOwnerApplications.filter((a) => a.status === "Pending").length
+  const approvedCount = mockCarOwnerApplications.filter((a) => a.status === "Approved").length
+  const rejectedCount = mockCarOwnerApplications.filter((a) => a.status === "Rejected").length
+
+  return(
+    <div className = "flex-1 overflow-auto p-4">
+      <div className = "mb-8">
+        <h1 className = "text-3xl font-bold text-foreground mb-2">Car Owner Applications</h1>
+        <p className = "text-muted-foreground">Review and manage car owner applications</p>
+      </div>
+
+      {/* metric cards */}
+      <div className = "grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <Card className = "p-6 bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-800">
+          <div className = "flex items-center justify-between">
+            <div>
+              <p className = "text-sm text-muted-foreground">Pending Reviews</p>
+              <p className = "text-3xl font-bold text-yellow-600 dark:text-yello-400">{pendingCount}</p>
+            </div>
+            <Clock className = "size-8 text-yellow-600 dark:text-yellow-400"/>
+          </div>
+        </Card>
+
+        <Card className = "p-6 bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800">
+          <div className = "flex items-center justify-between">
+            <div>
+              <p className = "text-sm text-muted-foreground">Approved</p>
+              <p className = "text-3xl font-bold text-green-600 dark:text-green-400">{approvedCount}</p>
+            </div>
+            <CheckCircle className = "size-8 text-green-600 dark:text-green-400"/>
+          </div>
+        </Card>
+
+        <Card className = "p-6 bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800">
+          <div className = "flex items-center justify-between">
+            <div>
+              <p className = "text-sm text-muted-foreground">Rejected</p>
+              <p className = "text-3xl font-bold text-red-600 dark:text-red-400">{rejectedCount}</p>
+            </div>
+            <XCircle className = "size-8 text-red-600 dark:text-red-400"/>
+          </div>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <Card className = "p-6 mb-8">
+        <div className = "grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <Label className = "block text-sm font-medium text-foreground mb-2">Search</Label>
+            <Input 
+              placeholder = "Business name, user, email..."
+              value = {searchTerm}
+              onChange = {(e) => setSearchTerm(e.target.value)}
+              className = "w-full"
+            />
+          </div>
+
+          <div>
+            <Label className = "block text-sm font-medium text-foreground mb-2">Status</Label>
+            <Select value = {statusFilter} onValueChange = {setStatusFilter}>
+                <SelectTrigger className = "w-full">
+                    <SelectValue placeholder = "All Status" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value = "All">All Status</SelectItem>
+                    <SelectItem value = "Pending">Pending</SelectItem>
+                    <SelectItem value = "Approved">Approved</SelectItem>
+                    <SelectItem value = "Rejected">Rejected</SelectItem>
+                </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label className = "block text-sm font-medium text-foreground mb-2">Sort By</Label>
+            <Select value = {sortBy} onValueChange = {setSortBy}>
+                <SelectTrigger className = "w-full">
+                    <SelectValue placeholder = "Newest First" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value = "newest">Newest First</SelectItem>
+                    <SelectItem value = "oldest">Oldest First</SelectItem>
+                </SelectContent>
+            </Select>
+          </div>
+
+          <div className = "flex items-end">
+            <Button
+              onClick = {() => {
+                  setSearchTerm("")
+                  setStatusFilter("All")
+                  setSortBy("newest")
+              }}
+              variant = "outline"
+              className = "w-full"
+            >
+              Clear Filters
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      {/* Applications Table */}
+      <ApplicationsTable
+        data={filteredApplications}
+        renderDialogContent={RenderDialogContent}
+        getStatusColor={getStatusColor}
+        getStatusIcon={getStatusIcon}
+      />
+    </div>
+  )
+}
+
+export default AdminUserApplicationPage

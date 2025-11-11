@@ -17,6 +17,13 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { 
+    Select, 
+    SelectTrigger,
+    SelectValue,
+    SelectContent,
+    SelectItem
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
@@ -63,18 +70,18 @@ export function UsersDataTable<TData, TValue>({
                     >
                         Rows per page
                     </Label>
-                    <select
-                        id = "users-table-page-size"
-                        value = {pageSize}
-                        onChange = {(e) => table.setPageSize(Number(e.target.value))}
-                        className = "rounded-md border border-input bg-background px-2 py-1 text-sm"
-                    >
-                        {[5, 10, 20, 50].map((size) => (
-                            <option key = {size} value = {size}>
-                                {size}
-                            </option>
-                        ))}
-                    </select>
+                    <Select value = {pageSize.toString()} onValueChange = {(e) => table.setPageSize(Number(e))}>
+                        <SelectTrigger>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {[5, 10, 20, 50].map((size) => (
+                                <SelectItem key = {size} value = {size.toString()}>
+                                    {size}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
 

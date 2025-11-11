@@ -17,8 +17,13 @@ import {
     TableHeader,
     TableRow, 
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { 
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem
+} from "@/components/ui/select";
 
 interface BookingsDataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -63,18 +68,18 @@ function BookingsDataTable<TData, TValue>({
           >
             Rows per page
           </label>
-          <select
-            id="bookings-table-page-size"
-            value={pageSize}
-            onChange={(event) => table.setPageSize(Number(event.target.value))}
-            className="rounded-md border border-input bg-background px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-          >
-            {[5, 10, 20, 50].map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
+          <Select value = {pageSize.toString()} onValueChange = {(e) => table.setPageSize(Number(e))}>
+            <SelectTrigger>
+              <SelectValue placeholder = "5" />
+            </SelectTrigger>
+            <SelectContent>
+              {[5, 10, 20, 50].map((size) => (
+                <SelectItem key = {size} value = {size.toString()}>
+                    {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
