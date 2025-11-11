@@ -7,6 +7,7 @@ import AdminLayout from './layout/adminLayout'
 import AdminCars from './pages/AdminCars'
 import AdminUsersPage from './pages/AdminUsers'
 import AdminBookings from './pages/AdminBookings'
+import AdminUserApplication from './pages/AdminUserApplication'
 
 export default function AppRouter() {
     return (
@@ -57,6 +58,15 @@ export default function AppRouter() {
                 element = {
                     <AdminLayout>
                         <AdminBookings />
+                    </AdminLayout>
+                }
+            />
+
+            <Route 
+                path = "/admin/application"
+                element = {
+                    <AdminLayout>
+                        <AdminUserApplication />
                     </AdminLayout>
                 }
             />
