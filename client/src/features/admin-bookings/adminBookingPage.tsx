@@ -3,7 +3,7 @@ import { bookingColumns, type BookingTableRow } from "./components/bookings-colu
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { mockBookings, mockCars, mockUsers } from "@/lib/mock-data"
+import { mockBookings} from "@/lib/mock-data"
 import { X } from "lucide-react"
 import { useState, useMemo } from "react"
 import { Label } from "@/components/ui/label"
@@ -14,22 +14,8 @@ import {
     SelectContent, 
     SelectItem 
 } from "@/components/ui/select"
-
-const getCarName = (carId: string) => {
-    return mockCars.find((c) => c.id === carId)?.name || "Unknown"
-}
-
-const getCustomerName = (customerId: string) => {
-    return mockUsers.find((u) => u.id === customerId)?.fullName || "Unknown"
-}
-
-const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-    })
-}
+import { formatDate } from "./utils/format"
+import { getCarName, getCustomerName } from "./utils/get"
 
 const AdminBookingPage = () => {
     const [searchTerm, setSearchTerm] = useState("")

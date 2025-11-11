@@ -1,4 +1,4 @@
-import AdminCarsPage from "@/features/admin-cars/pages/AdminCarsPage"
+import AdminCarsPage from "@/features/admin-cars/AdminCarsPage"
 
 const AdminCars = () => {
     return(

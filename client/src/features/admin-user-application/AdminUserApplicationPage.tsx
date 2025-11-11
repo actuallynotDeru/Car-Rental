@@ -7,8 +7,8 @@ import { CheckCircle, XCircle, Clock } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import ApplicationsTable from "./components/application-data-table"
-import type { Application } from "./components/application-columns"
-import { DialogFooter } from "@/components/ui/dialog"
+import { getStatusColor, getStatusIcon } from "./utils/get"
+import RenderDialogContent from "./components/modal-content"
 
 const AdminUserApplicationPage = () => {
   const [searchTerm, setSearchTerm] = useState("")
@@ -35,146 +35,9 @@ const AdminUserApplicationPage = () => {
     return filtered
   }, [searchTerm, statusFilter, sortBy])
 
-  const getStatusColor = (status:string) => {
-    switch(status) {
-      case "Pending":
-        return "bg-yellow-100 text-yellow-800"
-      case "Approved":
-        return "bg-green-100 text-green-800"
-      case "Rejected":
-        return "bg-red-100 text-red-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
-  }
-
-  const getStatusIcon = (status:string) => {
-    switch(status) {
-      case "Pending":
-        return <Clock className = "size-4" />
-      case "Approved":
-        return <CheckCircle className = "size-4" />
-      case "Rejected":
-        return <XCircle className = "size-4" />
-      default:
-        return null
-    }
-  }
-
   const pendingCount = mockCarOwnerApplications.filter((a) => a.status === "Pending").length
   const approvedCount = mockCarOwnerApplications.filter((a) => a.status === "Approved").length
   const rejectedCount = mockCarOwnerApplications.filter((a) => a.status === "Rejected").length
-
-  const renderDialogContent = (app: Application) => (
-    <>
-      {/* Personal Information */}
-      <div className="space-y-6">
-        <div>
-          <h3 className="text-lg font-semibold text-foreground mb-4">Personal Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-muted p-4 rounded-lg">
-              <p className="text-xs text-muted-foreground mb-1">Full Name</p>
-              <p className="font-semibold text-foreground">{app.userName}</p>
-            </div>
-            <div className="bg-muted p-4 rounded-lg">
-              <p className="text-xs text-muted-foreground mb-1">Email</p>
-              <p className="font-semibold text-foreground">{app.userEmail}</p>
-            </div>
-          </div>
-        </div>
-        {/* Business Information */}
-        <div>
-          <h3 className="text-lg font-semibold text-foreground mb-4">Business Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-muted p-4 rounded-lg">
-              <p className="text-xs text-muted-foreground mb-1">Business Name</p>
-              <p className="font-semibold text-foreground">{app.businessName}</p>
-            </div>
-            <div className="bg-muted p-4 rounded-lg">
-              <p className="text-xs text-muted-foreground mb-1">Business Phone</p>
-              <p className="font-semibold text-foreground">{app.businessPhone}</p>
-            </div>
-            <div className="bg-muted p-4 rounded-lg">
-              <p className="text-xs text-muted-foreground mb-1">Business Email</p>
-              <p className="font-semibold text-foreground">{app.businessEmail}</p>
-            </div>
-            <div className="bg-muted p-4 rounded-lg">
-              <p className="text-xs text-muted-foreground mb-1">Tax ID</p>
-              <p className="font-semibold text-foreground">{app.taxId}</p>
-            </div>
-            <div className="md:col-span-2 bg-muted p-4 rounded-lg">
-              <p className="text-xs text-muted-foreground mb-1">Business Address</p>
-              <p className="font-semibold text-foreground">{app.businessAddress}</p>
-            </div>
-          </div>
-        </div>
-        {/* Description */}
-        <div>
-          <h3 className="text-lg font-semibold text-foreground mb-4">Business Description</h3>
-          <div className="bg-muted p-4 rounded-lg">
-            <p className="text-foreground whitespace-pre-wrap">{app.description}</p>
-          </div>
-        </div>
-        {/* Documents */}
-        <div>
-          <h3 className="text-lg font-semibold text-foreground mb-4">Documents</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="border border-border rounded-lg p-4">
-              <p className="text-sm text-muted-foreground mb-2">Driving License</p>
-              <div className="bg-muted rounded p-2 text-center text-sm text-muted-foreground">📄 License Document</div>
-            </div>
-            <div className="border border-border rounded-lg p-4">
-              <p className="text-sm text-muted-foreground mb-2">Business License</p>
-              <div className="bg-muted rounded p-2 text-center text-sm text-muted-foreground">📄 License Document</div>
-            </div>
-          </div>
-        </div>
-        {/* Status */}
-        <div>
-          <h3 className="text-lg font-semibold text-foreground mb-4">Application Status</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-muted p-4 rounded-lg">
-              <p className="text-xs text-muted-foreground mb-1">Status</p>
-              <div className="flex items-center gap-2">
-                {getStatusIcon(app.status)}
-                <p className="font-semibold text-foreground">{app.status}</p>
-              </div>
-            </div>
-            <div className="bg-muted p-4 rounded-lg">
-              <p className="text-xs text-muted-foreground mb-1">Applied Date</p>
-              <p className="font-semibold text-foreground">{new Date(app.createdAt).toLocaleDateString()}</p>
-            </div>
-          </div>
-          {app.reviewedAt && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="text-xs text-muted-foreground mb-1">Reviewed Date</p>
-                <p className="font-semibold text-foreground">{new Date(app.reviewedAt).toLocaleDateString()}</p>
-              </div>
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="text-xs text-muted-foreground mb-1">Reviewed By</p>
-                <p className="font-semibold text-foreground">{app.reviewedBy}</p>
-              </div>
-              {app.adminNotes && (
-                <div className="md:col-span-2 bg-muted p-4 rounded-lg">
-                  <p className="text-xs text-muted-foreground mb-2">Admin Notes</p>
-                  <p className="text-foreground">{app.adminNotes}</p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-      <DialogFooter className="flex flex-col gap-2">
-        {app.status === "Pending" && (
-          <div className="flex flex-col sm:flex-row gap-2 w-full">
-            <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white">Approve Application</Button>
-            <Button className="flex-1 bg-red-600 hover:bg-red-700 text-white">Reject Application</Button>
-          </div>
-        )}
-      </DialogFooter>
-    </>
-  )
 
   return(
     <div className = "flex-1 overflow-auto p-4">
@@ -276,7 +139,7 @@ const AdminUserApplicationPage = () => {
       {/* Applications Table */}
       <ApplicationsTable
         data={filteredApplications}
-        renderDialogContent={renderDialogContent}
+        renderDialogContent={RenderDialogContent}
         getStatusColor={getStatusColor}
         getStatusIcon={getStatusIcon}
       />

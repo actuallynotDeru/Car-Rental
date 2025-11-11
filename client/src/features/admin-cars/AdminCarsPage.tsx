@@ -5,8 +5,8 @@ import { mockCars } from "@/lib/mock-data"
 import { Plus, X } from "lucide-react"
 import { useState, useMemo } from "react"
 import { Label } from "@/components/ui/label"
-import { Carcolumns } from "../components/cars-columns"
-import { CarsDataTable } from "../components/cars-data-table"
+import { Carcolumns } from "./components/cars-columns"
+import { CarsDataTable } from "./components/cars-data-table"
 import {
   Select,
   SelectContent,
