@@ -5,16 +5,15 @@ import { mockUsers } from "@/lib/mock-data";
 import { X } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectValue, SelectTrigger } from "@/components/ui/select";
 import { UsersDataTable } from "./components/users-data-table";
 import { userColumns } from "./components/users-columns";
-import { SelectTrigger } from "@radix-ui/react-select";
 
 const AdminUsers = () => {
     const [searchTerm, setSearchTerm] = useState("")
     const [filters, setFilters] = useState({
-        role: "",
-        status: "",
+        role: "all",
+        status: "all",
     })
 
     const filteredUsers = useMemo(() => {
@@ -23,8 +22,8 @@ const AdminUsers = () => {
             user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.email.toLowerCase().includes(searchTerm.toLowerCase())
             
-            const matchesRole = !filters.role || user.role === filters.role
-            const matchesStatus = !filters.status || user.status === filters.status
+            const matchesRole = filters.role === "all" || user.role === filters.role
+            const matchesStatus = filters.status === "all" || user.status === filters.status
 
             return matchesSearch && matchesRole && matchesStatus
         })
@@ -39,10 +38,10 @@ const AdminUsers = () => {
 
     const clearFilters = () => {
         setSearchTerm("")
-        setFilters({ role: "", status: ""})
+        setFilters({ role: "all", status: "all"})
     }
 
-    const hasActiveFilters = searchTerm || Object.values(filters).some((v) => v)
+    const hasActiveFilters = searchTerm || Object.values(filters).some((v) => v !== "all")
 
     return(
         <div className = "flex-1 overflow-auto">
@@ -55,7 +54,7 @@ const AdminUsers = () => {
                 <div className = "space-y-3">
                     <div className = "flex gap-2 flex-wrap items-end">
                         <div className = "flex-1 min-w-[200px]">
-                            <Label className = "text-sm fon-medium text-foreground mb-1 block">Search</Label>
+                            <Label className = "text-sm font-medium text-foreground mb-1 block">Search</Label>
                             <Input 
                                 placeholder = "Search users..."
                                 value = {searchTerm}
@@ -63,24 +62,21 @@ const AdminUsers = () => {
                             />
                         </div>
 
-{/* can be component */}
                         <div className = "min-w-[150px]">
                             <Label className = "text-sm font-medium text-foreground mb-1 block">Role</Label>
                             <Select
                             value={filters.role}
                             onValueChange={(e) => handleFilterChange("role", e)}
                             >
-                            <SelectTrigger className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground text-sm">
-                                <SelectValue placeholder="All Roles ⇅" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                <SelectLabel>User Role</SelectLabel>
-                                <SelectItem value="Admin">Admin</SelectItem>
-                                <SelectItem value="Customer">Customer</SelectItem>
-                                <SelectItem value="CarOwner">Car Owner</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="All" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value = "all">All</SelectItem>
+                                    <SelectItem value="Admin">Admin</SelectItem>
+                                    <SelectItem value="Customer">Customer</SelectItem>
+                                    <SelectItem value="CarOwner">Car Owner</SelectItem>
+                                </SelectContent>
                             </Select>
                         </div>
 
@@ -90,15 +86,13 @@ const AdminUsers = () => {
                                 value = {filters.status}
                                 onValueChange = {(e) => handleFilterChange("status", e)}
                             >
-                                <SelectTrigger className = "w-full px-3 py-2 border border-input rounded-md bg-background text-foreground text-sm">
-                                    <SelectValue placeholder = "All Statuses ⇅"/>
+                                <SelectTrigger className = "w-full">
+                                    <SelectValue placeholder = "All"/>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectGroup>
-                                        <SelectLabel>User Status</SelectLabel>
-                                        <SelectItem value = "Verified">Verified</SelectItem>
-                                        <SelectItem value = "Unerified">Unverified</SelectItem>
-                                    </SelectGroup>
+                                    <SelectItem value = "all">All</SelectItem>
+                                    <SelectItem value = "Verified">Verified</SelectItem>
+                                    <SelectItem value = "Unverified">Unverified</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
