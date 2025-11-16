@@ -4,8 +4,6 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
-  getSortedRowModel,
-  type SortingState,
   useReactTable,
 } from "@tanstack/react-table"
 import { useState } from "react"
@@ -34,20 +32,16 @@ function BookingsDataTable<TData, TValue>({
   columns,
   data,
 }: BookingsDataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState("")
 
   const table = useReactTable({
     data,
     columns,
     state: {
-      sorting,
       globalFilter,
     },
-    onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   })
@@ -90,32 +84,12 @@ function BookingsDataTable<TData, TValue>({
                             <TableRow key = {headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
                                     <TableHead key={header.id}>
-                                        {header.isPlaceholder ? null : header.column.getCanSort() ? (
-                                          <button
-                                            type="button"
-                                            onClick={header.column.getToggleSortingHandler()}
-                                            className="flex w-full items-center justify-between gap-2 text-left text-sm font-medium"
-                                          >
-                                            <span>
-                                              {flexRender(
-                                                header.column.columnDef.header,
-                                                header.getContext()
-                                              )}
-                                            </span>
-                                            <span className="text-xs text-muted-foreground">
-                                              {header.column.getIsSorted() === "asc"
-                                                ? "▲"
-                                                : header.column.getIsSorted() === "desc"
-                                                  ? "▼"
-                                                  : "↕"}
-                                            </span>
-                                          </button>
-                                        ) : (
-                                          flexRender(
-                                            header.column.columnDef.header,
-                                            header.getContext()
-                                          )
-                                        )}
+                                        {header.isPlaceholder
+                                          ? null
+                                          : flexRender(
+                                              header.column.columnDef.header,
+                                              header.getContext()
+                                            )}
                                       </TableHead>
                                 ))}
 

@@ -9,6 +9,7 @@ import AdminUsersPage from './pages/AdminUsers'
 import AdminBookings from './pages/AdminBookings'
 import AdminUserApplication from './pages/AdminUserApplication'
 import Products from './pages/ProductPage'
+import Profile from './pages/ProfilePage'
 
 export default function AppRouter() {
     return (
@@ -76,6 +77,13 @@ export default function AppRouter() {
                 path = "/products"
                 element = {
                     <Products />
+                }
+            />
+
+            <Route 
+                path = "/profile"
+                element = {
+                    <Profile />
                 }
             />
 
