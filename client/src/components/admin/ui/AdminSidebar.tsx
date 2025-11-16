@@ -79,7 +79,6 @@ const carsNavigation: NavigationType[] = [
     icon: Car,
     submenu: [
       { name: 'All Cars', href: '/admin/cars' },
-      { name: 'Add Car', href: '/admin/cars/create' },
     ],
   },
 ];
@@ -91,7 +90,6 @@ const bookingsNavigation: NavigationType[] = [
     icon: Book,
     submenu: [
       { name: 'All Bookings', href: '/admin/bookings' },
-      { name: 'Add Booking', href: '/admin/bookings/create' },
     ],
   },
 ];
