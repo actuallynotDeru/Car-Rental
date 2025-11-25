@@ -10,6 +10,7 @@ import AdminBookings from './pages/AdminBookings'
 import AdminUserApplication from './pages/AdminUserApplication'
 import Products from './pages/ProductPage'
 import Profile from './pages/ProfilePage'
+import ApplicationFormPage from './pages/ApplicationForm'
 
 export default function AppRouter() {
     return (
@@ -84,6 +85,13 @@ export default function AppRouter() {
                 path = "/profile"
                 element = {
                     <Profile />
+                }
+            />
+
+            <Route 
+                path = "/application/form"
+                element = {
+                    <ApplicationFormPage />
                 }
             />
 
