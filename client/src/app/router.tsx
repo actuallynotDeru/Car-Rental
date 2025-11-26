@@ -11,6 +11,7 @@ import AdminUserApplication from './pages/AdminUserApplication'
 import Products from './pages/ProductPage'
 import Profile from './pages/ProfilePage'
 import ApplicationFormPage from './pages/ApplicationForm'
+import FleetPage from './pages/Fleet'
 
 export default function AppRouter() {
     return (
@@ -92,6 +93,13 @@ export default function AppRouter() {
                 path = "/application/form"
                 element = {
                     <ApplicationFormPage />
+                }
+            />
+
+            <Route 
+                path = "/fleet"
+                element = {
+                    <FleetPage />
                 }
             />
 
