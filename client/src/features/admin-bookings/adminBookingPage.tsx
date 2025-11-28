@@ -98,7 +98,7 @@ const AdminBookingPage = () => {
     
     return(
         <>
-            <div className = "flex-1 overflow-auto p-8">
+            <div className = "flex-1 overflow-auto">
                 <div className = "mb-8">
                     <h1 className = "text-3xl font-bold text-foreground mb-2">Bookings Management</h1>
                     <p className = "text-muted-foreground">View and manage all car rental bookings</p>
@@ -110,7 +110,7 @@ const AdminBookingPage = () => {
                             <div className = "flex-1 min-w-[200px]">
                                 <Label className = "text-sm font-medium text-foreground mb-1 block">Search</Label>
                                 <Input 
-                                    placeholder = "Search bookings..."
+                                    placeholder = "Search bookings by Customer name and Car name..."
                                     value = {searchTerm}
                                     onChange = {(e) => setSearchTerm(e.target.value)}
                                 />

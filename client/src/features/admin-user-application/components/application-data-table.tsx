@@ -2,25 +2,25 @@ import { useState, type ReactNode } from "react"
 import { Card } from "@/components/ui/card"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
-import { applicationColumns, type Application, type ApplicationTableMeta } from "./application-columns"
+import { applicationColumns, type Applycation, type ApplicationTableMeta } from "./application-columns"
 
 type ApplicationsTableProps = {
-  data: Application[]
-  renderDialogContent: (app: Application) => ReactNode
+  data: Applycation[]
+  renderDialogContent: (app: Applycation) => ReactNode
   getStatusColor: ApplicationTableMeta["getStatusColor"]
   getStatusIcon: ApplicationTableMeta["getStatusIcon"]
 }
 
 const ApplicationsTable = ({ data, renderDialogContent, getStatusColor, getStatusIcon }: ApplicationsTableProps) => {
   const [open, setOpen] = useState(false)
-  const [selectedApp, setSelectedApp] = useState<Application | null>(null)
+  const [selectedApp, setSelectedApp] = useState<Applycation | null>(null)
 
-  const handleOpenDialog = (app: Application) => {
+  const handleOpenDialog = (app: Applycation) => {
     setSelectedApp(app)
     setOpen(true)
   }
 
-  const table = useReactTable<Application>({
+  const table = useReactTable<Applycation>({
     data,
     columns: applicationColumns,
     getCoreRowModel: getCoreRowModel(),

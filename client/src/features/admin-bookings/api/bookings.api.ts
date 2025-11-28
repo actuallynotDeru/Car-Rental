@@ -22,7 +22,7 @@ export async function getBookings(): Promise<Bookings[]> {
       
       ownerId: {
         ...booking.ownerId,
-          id: booking.ownerId.id || booking.ownerId._id
+        id: booking.ownerId.id || booking.ownerId._id
       },
       
       customerId: {
