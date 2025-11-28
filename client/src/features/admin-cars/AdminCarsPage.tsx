@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
-import { mockCars } from "@/lib/mock-data"
 import { Plus, X } from "lucide-react"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Label } from "@/components/ui/label"
 import { Carcolumns } from "./components/cars-columns"
 import { CarsDataTable } from "./components/cars-data-table"
@@ -14,6 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { getCars } from "./api/car.api"
+import type { Car } from "./types/cars.types"
 
 export default function CarsPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -22,9 +23,29 @@ export default function CarsPage() {
     transmission: "all",
     fuelType: "all",
   })
+  const [cars, setCars] = useState<Car[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  
+  useEffect(() => {
+    const fetchCars = async() => {
+      try {
+        setLoading(true)
+        setError(null)
+        const data = await getCars()
+        setCars(data)
+      } catch(error) {
+        setError("Failed to load cars. Please try again")
+        console.error("Error fetching users: ", error);
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchCars()
+  }, [])
 
   const filteredCars = useMemo(() => {
-    return mockCars.filter((car) => {
+    return cars.filter((car) => {
       const matchesSearch = car.name.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesStatus = filters.status === "all" || car.status === filters.status
       const matchesTransmission = filters.transmission === "all" || car.carDetails.transmission === filters.transmission
@@ -32,7 +53,7 @@ export default function CarsPage() {
 
       return matchesSearch && matchesStatus && matchesTransmission && matchesFuelType
     })
-  }, [searchTerm, filters])
+  }, [cars, searchTerm, filters])
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({
@@ -48,6 +69,22 @@ export default function CarsPage() {
 
   const hasActiveFilters = searchTerm || Object.values(filters).some((v) => v !== "all")
 
+  if(loading) {
+    return (
+      <div className = "flex-1 flex items-center justify-center">
+        <p className = "text-muted-foreground">Loading users...</p>
+      </div>
+    )
+  }
+  
+  if(error) {
+    return(
+      <div className = "flex-1 flex items-center justify-center">
+        <p className = "text-destructive">{ error }</p>
+      </div>
+    )
+  }
+  
   return (
     <div className="flex-1 overflow-auto">
       <div className="flex items-center justify-between mb-8">

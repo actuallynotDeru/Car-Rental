@@ -3,9 +3,8 @@ import { bookingColumns, type BookingTableRow } from "./components/bookings-colu
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { mockBookings} from "@/lib/mock-data"
 import { X } from "lucide-react"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Label } from "@/components/ui/label"
 import { 
     Select, 
@@ -15,31 +14,51 @@ import {
     SelectItem 
 } from "@/components/ui/select"
 import { formatDate } from "./utils/format"
-import { getCarName, getCustomerName } from "./utils/get"
+import { getBookings } from "./api/bookings.api"
+import type { Bookings } from "./types/bookings.types"
 
 const AdminBookingPage = () => {
     const [searchTerm, setSearchTerm] = useState("")
     const [filters, setFilters] = useState({
         status: "all",
     })
+    const [bookings, setBookings] = useState<Bookings[]>([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+    
+    useEffect(() => {
+      const fetchBookings = async() => {
+        try {
+          setLoading(true)
+          setError(null)
+          const data = await getBookings()
+          setBookings(data)
+        } catch(error) {
+          setError("Failed to load users. Please try again");
+          console.error("Error fetching bookings: ", error);
+        } finally {
+          setLoading(false)
+        }
+      }
+      fetchBookings()
+    }, [])
 
     const filteredBookings = useMemo(() => {
-        return mockBookings.filter((booking) => {
-            const matchesSearch = 
-                booking.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                getCustomerName(booking.customerId).toLowerCase().includes(searchTerm.toLowerCase()) ||
-                getCarName(booking.carId).toLowerCase().includes(searchTerm.toLowerCase())
+        return bookings.filter((booking) => {
+          const matchesSearch =
+              booking.carId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              booking.customerId.fullName.toLowerCase().includes(searchTerm.toLowerCase())
             const matchesStatus = filters.status === "all" || booking.status === filters.status
 
             return matchesSearch && matchesStatus
         })
-    }, [searchTerm, filters])
+    }, [bookings, searchTerm, filters])
 
     const tableData = useMemo<BookingTableRow[]>(() => {
         return filteredBookings.map((booking) => ({
             ...booking,
-            customerName: getCustomerName(booking.customerId),
-            carName: getCarName(booking.carId),
+            customerName: booking.customerId.fullName,
+            carName: booking.carId.name,
             startDateLabel: booking.pickupDate ? formatDate(booking.pickupDate) : "-",
             endDateLabel: booking.returnDate ? formatDate(booking.returnDate) : "-", 
         }))
@@ -61,6 +80,22 @@ const AdminBookingPage = () => {
 
     const hasActiveFilters = searchTerm || Object.values(filters).some((v) => v !== "all")
 
+    if(loading) {
+      return (
+        <div className = "flex-1 flex items-center justify-center">
+          <p className = "text-muted-foreground">Loading bookings...</p>
+        </div>
+      )
+    }
+    
+    if(error) {
+      return(
+        <div className = "flex-1 flex items-center justify-center">
+          <p className="text-destructive">{error}</p>
+        </div>
+      )
+    }
+    
     return(
         <>
             <div className = "flex-1 overflow-auto p-8">

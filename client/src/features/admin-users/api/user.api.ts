@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "@/config/apiURL";
-import type { User } from "@/types";
+import type { User } from "../types/user.types";
 import axios from 'axios'
 
 export async function getUsers(): Promise<User[]> {
@@ -23,22 +23,5 @@ export async function getUsers(): Promise<User[]> {
   } catch(error) {
     console.error("Error fetching users: ", error);
     throw new Error("Failed to fetch users");
-  }
-}
-
-export async function getUserById(id: string): Promise<User> {
-  try {
-    const res = await axios.get(`${API_BASE_URL}/users/${id}`, {
-      headers: { Accept: 'application/json' },
-    });
-    
-    const user = res.data;
-    return {
-      ...user,
-      id: user.id || user._id
-    };
-  } catch(error) {
-    console.error("Error fetching user: ", error);
-    throw new Error("Failed to fetch user");
   }
 }
