@@ -1,9 +1,9 @@
-import type { Application } from "./application-columns";
+import type { Applycation } from "./application-columns";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { getStatusIcon } from "../utils/get";
 
-const RenderDialogContent = (app: Application) => (
+const RenderDialogContent = (app: Applycation) => (
     <>
     <div className="space-y-6">
         <div>
@@ -11,11 +11,11 @@ const RenderDialogContent = (app: Application) => (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-muted p-4 rounded-lg">
                     <p className="text-xs text-muted-foreground mb-1">Full Name</p>
-                    <p className="font-semibold text-foreground">{app.userName}</p>
+                    <p className="font-semibold text-foreground">{app.userId.fullName}</p>
                 </div>
                 <div className="bg-muted p-4 rounded-lg">
                     <p className="text-xs text-muted-foreground mb-1">Email</p>
-                    <p className="font-semibold text-foreground">{app.userEmail}</p>
+                    <p className="font-semibold text-foreground">{app.userId.email}</p>
                 </div>
             </div>
         </div>
@@ -83,7 +83,7 @@ const RenderDialogContent = (app: Application) => (
                 </div>
                 <div className="bg-muted p-4 rounded-lg">
                     <p className="text-xs text-muted-foreground mb-1">Applied Date</p>
-                    <p className="font-semibold text-foreground">{new Date(app.createdAt).toLocaleDateString()}</p>
+                    <p className="font-semibold text-foreground">{new Date(app.reviewedAt).toLocaleDateString()}</p>
                 </div>
             </div>
             {app.reviewedAt && (
@@ -94,7 +94,7 @@ const RenderDialogContent = (app: Application) => (
                 </div>
                 <div className="bg-muted p-4 rounded-lg">
                     <p className="text-xs text-muted-foreground mb-1">Reviewed By</p>
-                    <p className="font-semibold text-foreground">{app.reviewedBy}</p>
+                    <p className="font-semibold text-foreground">{app.reviewedBy.fullName}</p>
                 </div>
                 {app.adminNotes && (
                     <div className="md:col-span-2 bg-muted p-4 rounded-lg">

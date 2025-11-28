@@ -1,25 +1,46 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { mockCarOwnerApplications } from "@/lib/mock-data"
 import { CheckCircle, XCircle, Clock } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import ApplicationsTable from "./components/application-data-table"
 import { getStatusColor, getStatusIcon } from "./utils/get"
 import RenderDialogContent from "./components/modal-content"
+import { getApplications } from "./api/application.api"
+import type { Application } from "./types/application.types"
 
 const AdminUserApplicationPage = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("All")
   const [sortBy, setSortBy] = useState<string>("newest")
+  const [applications, setApplications] = useState<Application[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  
+  useEffect(() => {
+    const fetchApplications = async() => {
+      try {
+        setLoading(true)
+        setError(null)
+        const data = await getApplications()
+        setApplications(data);
+      } catch(error) {
+        setError("Failed to load applications. Please try again.");
+        console.error("Error fetching applications: ", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchApplications()
+  }, [])
 
   const filteredApplications = useMemo(() => {
-    const filtered = mockCarOwnerApplications.filter((app) => {
+    const filtered = applications.filter((app) => {
       const matchesSearch =
        app.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-       app.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       app.userId.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
        app.businessEmail.toLowerCase().includes(searchTerm.toLowerCase())
 
       const matchesStatus = statusFilter === "All" || app.status === statusFilter
@@ -33,12 +54,28 @@ const AdminUserApplicationPage = () => {
       filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
     }
     return filtered
-  }, [searchTerm, statusFilter, sortBy])
+  }, [applications, searchTerm, statusFilter, sortBy])
 
-  const pendingCount = mockCarOwnerApplications.filter((a) => a.status === "Pending").length
-  const approvedCount = mockCarOwnerApplications.filter((a) => a.status === "Approved").length
-  const rejectedCount = mockCarOwnerApplications.filter((a) => a.status === "Rejected").length
+  const pendingCount = applications.filter((a) => a.status === "Pending").length
+  const approvedCount = applications.filter((a) => a.status === "Approved").length
+  const rejectedCount = applications.filter((a) => a.status === "Rejected").length
 
+  if(loading) {
+    return(
+      <div className = "flex-1 flex items-center justify-center">
+        <p className = "text-muted-foreground">Loading Applications...</p>
+      </div>
+    )
+  }
+  
+  if(error) {
+    return (
+      <div className = "flex-1 flex items-center justify-center">
+        <p className="text-destructive">{error}</p>
+      </div>
+    )
+  }
+  
   return(
     <div className = "flex-1 overflow-auto p-4">
       <div className = "mb-8">

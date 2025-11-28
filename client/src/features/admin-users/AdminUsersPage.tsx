@@ -1,13 +1,14 @@
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { mockUsers } from "@/lib/mock-data";
 import { X } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectValue, SelectTrigger } from "@/components/ui/select";
 import { UsersDataTable } from "./components/users-data-table";
 import { userColumns } from "./components/users-columns";
+import { getUsers } from "./api/user.api";
+import type { User } from "@/types";
 
 const AdminUsers = () => {
     const [searchTerm, setSearchTerm] = useState("")
@@ -15,9 +16,31 @@ const AdminUsers = () => {
         role: "all",
         status: "all",
     })
+    const [users, setUsers] = useState<User[]>([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+
+    // Fetch users from API on component mount
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                setLoading(true)
+                setError(null)
+                const data = await getUsers()
+                setUsers(data)
+            } catch (err) {
+                setError("Failed to load users. Please try again.")
+                console.error("Error fetching users:", err)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchUsers()
+    }, [])
 
     const filteredUsers = useMemo(() => {
-        return mockUsers.filter((user) => {
+        return users.filter((user) => {
             const matchesSearch = 
             user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -27,7 +50,7 @@ const AdminUsers = () => {
 
             return matchesSearch && matchesRole && matchesStatus
         })
-    }, [searchTerm, filters])
+    }, [users, searchTerm, filters])
 
     const handleFilterChange = (key: string, value: string) => {
         setFilters((prev) => ({
@@ -42,6 +65,22 @@ const AdminUsers = () => {
     }
 
     const hasActiveFilters = searchTerm || Object.values(filters).some((v) => v !== "all")
+
+    if (loading) {
+        return (
+            <div className="flex-1 flex items-center justify-center">
+                <p className="text-muted-foreground">Loading users...</p>
+            </div>
+        )
+    }
+
+    if (error) {
+        return (
+            <div className="flex-1 flex items-center justify-center">
+                <p className="text-destructive">{error}</p>
+            </div>
+        )
+    }
 
     return(
         <div className = "flex-1 overflow-auto">
@@ -76,6 +115,7 @@ const AdminUsers = () => {
                                     <SelectItem value="Admin">Admin</SelectItem>
                                     <SelectItem value="Customer">Customer</SelectItem>
                                     <SelectItem value="CarOwner">Car Owner</SelectItem>
+                                    <SelectItem value="Registrar">Registrar</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

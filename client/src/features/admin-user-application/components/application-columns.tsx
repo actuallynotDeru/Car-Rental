@@ -3,17 +3,17 @@ import type { ReactNode } from "react"
 import { DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Eye } from "lucide-react"
-import { mockCarOwnerApplications } from "@/lib/mock-data"
+import type { Application } from "../types/application.types"
 
-export type Application = (typeof mockCarOwnerApplications)[number]
+export type Applycation = Application;
 
 export type ApplicationTableMeta = {
-  openDialog: (app: Application) => void
-  getStatusColor: (status: Application["status"]) => string
-  getStatusIcon: (status: Application["status"]) => ReactNode
+  openDialog: (app: Applycation) => void
+  getStatusColor: (status: Applycation["status"]) => string
+  getStatusIcon: (status: Applycation["status"]) => ReactNode
 }
 
-export const applicationColumns: ColumnDef<Application>[] = [
+export const applicationColumns: ColumnDef<Applycation>[] = [
   {
     accessorKey: "businessName",
     header: () => <span className="text-sm font-semibold text-foreground">Business Name</span>,
@@ -22,11 +22,11 @@ export const applicationColumns: ColumnDef<Application>[] = [
   {
     accessorKey: "userName",
     header: () => <span className="text-sm font-semibold text-foreground">Owner</span>,
-    cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.userName}</span>,
+    cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.userId.fullName}</span>,
   },
   {
     accessorKey: "businessEmail",
-    header: () => <span className="text-sm font-semibold text-foreground">Email</span>,
+    header: () => <span className="text-sm font-semibold text-foreground">Business Email</span>,
     cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.businessEmail}</span>,
   },
   {

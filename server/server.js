@@ -1,6 +1,7 @@
 import express from "express"
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cors from "cors"
 
 import userRoutes from "./routes/userRoutes.js";
 import carRoutes from "./routes/carRoutes.js";
@@ -10,6 +11,11 @@ import carOwnerApplicationRoutes from "./routes/carOwnerApplicationRoutes.js";
 dotenv.config();
 const app = express();
 
+app.use(cors({
+  origin: "http://localhost:5173",
+  methods: "GET,POST,PUT,DELETE,PATCH",
+  credentials: true
+}));
 app.use(express.json());
 
 app.use("/api/users", userRoutes);
