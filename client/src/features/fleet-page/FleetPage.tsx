@@ -4,6 +4,7 @@ import type React from "react"
 import { useState, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { Card, CardContent } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -169,14 +170,6 @@ export default function FleetPage() {
     setDeleteConfirmId(null)
   }
 
-  const toggleAvailability = (carId: string) => {
-    setOwnerCars((prev) =>
-      prev.map((car) =>
-        car.id === carId ? { ...car, status: car.status === "Available" ? "Unavailable" : "Available" } : car,
-      ),
-    )
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
       <div className="max-w-7xl mx-auto">
@@ -185,13 +178,13 @@ export default function FleetPage() {
           <Button
             variant="ghost"
             onClick={() => navigate("/")}
-            className="mb-4 gap-2"
+            className="mb-4 gap-2 hover:cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
           </Button>
-          <h1 className="text-3xl font-bold text-slate-900">My Fleet</h1>
-          <p className="text-slate-600 mt-1">Manage your vehicles and track performance</p>
+          <h1 className="text-3xl font-bold text-slate-900">Your Fleet</h1>
+          <p className="text-slate-600 mt-1">{filteredCars.length} car{filteredCars.length !== 1 ? "s" : ""} in your fleet</p>
         </div>
 
         {/* Stats Cards */}
@@ -208,7 +201,7 @@ export default function FleetPage() {
         </div>
 
         {/* Filters and Add Button */}
-        <Card className="border-0 shadow-sm mb-6">
+        <Card className="bg-transparent shadow-md mb-6 border border-slate-300">
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
               <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
@@ -221,15 +214,19 @@ export default function FleetPage() {
                     className="pl-10 w-full sm:w-64"
                   />
                 </div>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                <Select
+                  value = {statusFilter}
+                  onValueChange = {(e) => setStatusFilter(e)}
                 >
-                  <option value="all">All Status</option>
-                  <option value="Available">Available</option>
-                  <option value="Unavailable">Unavailable</option>
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder = "All Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value = "all">All Status</SelectItem>
+                    <SelectItem value = "Available">Available</SelectItem>
+                    <SelectItem value = "Unavailable">Unavailable</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <Dialog onOpenChange={(open) => { setAddDialogOpen(open); if (!open) resetForm(); }}>
                 <DialogTrigger asChild>
@@ -243,13 +240,6 @@ export default function FleetPage() {
           </CardContent>
         </Card>
 
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold text-slate-900">Your Vehicles</h2>
-          <p className="text-sm text-slate-600">
-            {filteredCars.length} car{filteredCars.length !== 1 ? "s" : ""} in your fleet
-          </p>
-        </div>
-
         {filteredCars.length === 0 ? (
           <Card className="border-0 shadow-sm">
             <CardContent className="py-12">
@@ -262,14 +252,14 @@ export default function FleetPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCars.map((car) => (
-              <Card key={car.id} className="shadow-sm overflow-hidden hover:shadow-md transition-shadow border border-gray-300">
+              <Card key={car.id} className="shadow-sm overflow-hidden hover:shadow-2xl transition-shadow border border-gray-300">
                 <div className="relative">
                   <img
                     src={car.image || "/placeholder.svg?height=200&width=400&query=car"}
                     alt={car.name}
                     className="w-full h-48 object-cover bg-slate-100"
                   />
-                  <button onClick={() => toggleAvailability(car.id)} className="absolute top-3 right-3">
+                  <div className="absolute top-3 right-3">
                     <Badge
                       className={
                         car.status === "Available"
@@ -279,7 +269,7 @@ export default function FleetPage() {
                     >
                       {car.status}
                     </Badge>
-                  </button>
+                  </div>
                 </div>
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between mb-3">
