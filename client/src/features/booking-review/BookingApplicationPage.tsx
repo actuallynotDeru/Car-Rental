@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from "@/components/ui/dialog"
-import { X, Search, Calendar, DollarSign, User, Car, FileText, CheckCircle, XCircle, Clock, Eye } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { X, Search, Calendar, DollarSign, User, Car, FileText, CheckCircle, XCircle, Clock, Eye, ArrowLeft } from "lucide-react"
 import { calculateDays, formatDate, getStatusBadge } from "./utils/booking-review.utils"
+import { DialogDescription } from "@radix-ui/react-dialog"
+import { useNavigate } from "react-router-dom"
 
 // Mock data for rental applications
 const mockApplications = [
@@ -89,6 +91,7 @@ const BookingApplication = () => {
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [viewDetailsDialog, setViewDetailsDialog] = useState(false);
   const [actionDialog, setActionDialog] = useState({ open: false, action: null, application: null })
+  const navigate = useNavigate();
   
   const filteredApplications = useMemo(() => {
     return mockApplications.filter((app) => {
@@ -112,12 +115,25 @@ const BookingApplication = () => {
     setFilters({ status: "all", car: "all" });
   }
   
+  const viewDetails = (application) => {
+    setSelectedApplication(application);
+  }
+  
   const hasActiveFilters = searchTerm || Object.values(filters).some((v) => v !== "all")
   
   const uniqueCars = [...new Set(mockApplications.map((app) => app.carName))]
   
   return(
-    <div className = "flex-1 overflow-auto">
+    <div className = "flex-1 overflow-auto p-16">
+      <Button
+        variant="ghost"
+        onClick={() => navigate("/")}
+        className="mb-4 gap-2 hover:cursor-pointer"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back
+      </Button>
+      
       <div className = "mb-8">
         <h1 className = "text-3xl font-bold text-foreground mb-2">Car Rental Applications</h1>
         <p className = "text-muted-foreground">Review and manage rental requests for your vehicles</p>
@@ -257,13 +273,110 @@ const BookingApplication = () => {
                       variant = "outline"
                       size = "sm"
                       className = "flex-1"
+                      onClick = {() => viewDetails(application)}
                     >
                       <Eye className = "size-4 mr-1" />
                       View Details
                     </Button>
                   </DialogTrigger>
                   <DialogContent className = "max-w-2xl">
-                    
+                    <DialogHeader>
+                      <DialogTitle>Application Details</DialogTitle>
+                      <DialogDescription>Complete information about this rental application</DialogDescription>
+                    </DialogHeader>
+                    {selectedApplication && (
+                      <div className = "space-y-4 py-4">
+                        <div className = "grid grid-cols-2 gap-4">
+                          <div>
+                            <h4 className = "font-semibold text-sm text-muted-foreground mb-1">Customer Name</h4>
+                            <p className="text-foreground">{ selectedApplication.customerName }</p>
+                          </div>
+                          
+                          <div>
+                            <h4 className = "font-semibold text-sm text-muted-foreground mb-1">Email</h4>
+                            <p className="text-foreground">{ selectedApplication.customerEmail }</p>
+                          </div>
+                          
+                          <div>
+                            <h4 className = "font-semibold text-sm text-muted-foreground mb-1">Phone</h4>
+                            <p className="text-foreground">{ selectedApplication.customerPhone }</p>
+                          </div>
+                          
+                          <div>
+                            <h4 className = "font-semibold text-sm text-muted-foreground mb-1">Status</h4>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusBadge(selectedApplication.status)}`}>
+                              {selectedApplication.status}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className = "border-t pt-4">
+                          <h4 className = "font-semibold text-sm text-muted-foreground mb-2">Vehicle Information</h4>
+                          <div className = "grid grid-cols-2 gap-4">
+                            <div>
+                              <p className = "text-sm text-muted-foreground">Car Name</p>
+                              <p className="text-foreground font-medium">{ selectedApplication.carName }</p>
+                            </div>
+                            
+                            <div>
+                              <p className = "text-sm text-muted-foreground">Plate Number</p>
+                              <p className="text-foreground font-medium">{ selectedApplication.carPlate }</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className = "border-t pt-4">
+                          <h4 className = "font-semibold text-sm text-muted-foreground mb-2">Booking Details</h4>
+                          <div className = "grid grid-cols-2 gap-4">
+                            <div>
+                              <p className = "text-sm text-muted-foreground">Pickup Date</p>
+                              <p className="text-foreground font-medium">{ formatDate(selectedApplication.pickupDate) }</p>
+                            </div>
+                            
+                            <div>
+                              <p className = "text-sm text-muted-foreground">Return Date</p>
+                              <p className="text-foreground font-medium">{ formatDate(selectedApplication.returnDate) }</p>
+                            </div>
+                            
+                            <div>
+                              <p className = "text-sm text-muted-foreground">Duration</p>
+                              <p className="text-foreground font-medium">{calculateDays(selectedApplication.pickupDate, selectedApplication.returnDate)} days</p>                            </div>
+                            
+                            <div>
+                              <p className = "text-sm text-muted-foreground">Total Price</p>
+                              <p className="text-foreground font-medium">${ selectedApplication.totalPrice }</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className = "border-t pt-4">
+                          <h4 className = "font-semibold text-sm text-muted-foreground mb-2">Documents</h4>
+                          <div className = "grid grid-cols-2 gap-4">
+                            <div>
+                              <p className = "text-sm text-muted-foreground mb-2">Payment Proof</p>
+                              <Button
+                                variant = "outline"
+                                size = "sm"
+                                className = "w-full"
+                              >
+                                View Payment Proof
+                              </Button>
+                            </div>
+                            
+                            <div>
+                              <p className = "text-sm text-muted-foreground mb-2">ID Photo</p>
+                              <Button
+                                variant = "outline"
+                                size = "sm"
+                                className = "w-full"
+                              >
+                                View ID Photo
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </DialogContent>
                 </Dialog>
 
