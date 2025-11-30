@@ -12,6 +12,7 @@ import Products from './pages/ProductPage'
 import Profile from './pages/ProfilePage'
 import ApplicationFormPage from './pages/ApplicationForm'
 import FleetPage from './pages/Fleet'
+import BookingApplicationPage from './pages/BookingApplication'
 
 export default function AppRouter() {
     return (
@@ -101,6 +102,13 @@ export default function AppRouter() {
                 element = {
                     <FleetPage />
                 }
+            />
+            
+            <Route 
+            path = "/booking/review"
+            element = {
+              <BookingApplicationPage />
+            }
             />
 
         </Routes>
