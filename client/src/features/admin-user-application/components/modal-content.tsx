@@ -83,7 +83,7 @@ const RenderDialogContent = (app: Applycation) => (
                 </div>
                 <div className="bg-muted p-4 rounded-lg">
                     <p className="text-xs text-muted-foreground mb-1">Applied Date</p>
-                    <p className="font-semibold text-foreground">{new Date(app.reviewedAt).toLocaleDateString()}</p>
+                    <p className="font-semibold text-foreground">{new Date(app.createdAt).toLocaleDateString()}</p>
                 </div>
             </div>
             {app.reviewedAt && (
