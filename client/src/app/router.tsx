@@ -84,7 +84,7 @@ export default function AppRouter() {
             />
 
             <Route 
-                path = "/profile"
+                path = "/profile/:userId"
                 element = {
                     <Profile />
                 }
