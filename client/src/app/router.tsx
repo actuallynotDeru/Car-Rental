@@ -77,7 +77,7 @@ export default function AppRouter() {
             />
             
             <Route 
-                path = "/products"
+                path = "/products/:carId"
                 element = {
                     <Products />
                 }
