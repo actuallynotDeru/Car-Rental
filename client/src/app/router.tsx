@@ -94,14 +94,14 @@ export default function AppRouter() {
             />
             
             <Route 
-                path = "/products"
+                path = "/products/:carId"
                 element = {
                     <Products />
                 }
             />
 
             <Route 
-                path = "/profile"
+                path = "/profile/:userId"
                 element = {
                     <Profile />
                 }
