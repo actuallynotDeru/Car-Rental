@@ -1,6 +1,9 @@
 import { Sun } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 
 const Header = () => {
+    const Navigate = useNavigate();
     return(
         <div className="flex justify-between bg-blue-400 py-4 text-white">
             <div className = "px-8">
@@ -8,15 +11,15 @@ const Header = () => {
             </div>
 
             <div className = "px-8 space-x-8 flex text-white self-center">
-                <p>Rent</p>
-                <p>About</p>
-                <p>Locations</p>
+                <a href="/rental">Rent</a>
+                <a href="">About</a>
+                <a>List Your Car</a>
             </div>
 
             <div className = "px-8 space-x-8 flex text-white self-center">
                 <Sun size = {20} className = "self-center"/>
-                <p>Sign Up</p>
-                <p>Log In</p>
+                <a href="/signup">Sign Up</a>
+                <a href="/login">Log In</a>
             </div>
         </div>
     )

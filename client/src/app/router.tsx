@@ -1,5 +1,6 @@
 import { Routes, Route} from 'react-router-dom'
 
+
 import MainPage from './pages/MainPage'
 import Rental from './pages/Rental'
 import AdminPage from './pages/AdminDashboard'
@@ -13,6 +14,8 @@ import Profile from './pages/ProfilePage'
 import ApplicationFormPage from './pages/ApplicationForm'
 import FleetPage from './pages/Fleet'
 import BookingApplicationPage from './pages/BookingApplication'
+import LoginPage from './pages/LoginForm'
+import SignupPage from './pages/SignupForm'
 
 export default function AppRouter() {
     return (
@@ -21,6 +24,20 @@ export default function AppRouter() {
                 path = "/"
                 element = {
                     <MainPage />
+                }
+            />
+
+            <Route 
+                path = "/login"
+                element = {
+                    <LoginPage />
+                }
+            />
+
+            <Route 
+                path = "/signup"
+                element = {
+                    <SignupPage/>
                 }
             />
 
