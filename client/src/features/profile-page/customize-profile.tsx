@@ -9,7 +9,7 @@ import { User, Mail, Phone, MapPin, Calendar, Shield, ArrowLeft, Info} from "luc
 import { ProfileAPI } from "./api/profile.api";
 import type { UserProfile } from "./types/profile.types";
 
-const ProfilePage = () => {
+const CustomizeProfile = () => {
   const { userId } = useParams<{ userId: string }>();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -222,4 +222,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default CustomizeProfile;

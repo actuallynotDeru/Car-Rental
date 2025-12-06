@@ -10,12 +10,13 @@ import AdminUsersPage from './pages/AdminUsers'
 import AdminBookings from './pages/AdminBookings'
 import AdminUserApplication from './pages/AdminUserApplication'
 import Products from './pages/ProductPage'
-import Profile from './pages/ProfilePage'
+import ProfileCustomization from './pages/ProfileCustomizationPage'
 import ApplicationFormPage from './pages/ApplicationForm'
 import FleetPage from './pages/Fleet'
 import BookingApplicationPage from './pages/BookingApplication'
 import LoginPage from './pages/LoginForm'
 import SignupPage from './pages/SignupForm'
+import Profile from './pages/ProfilePage'
 
 export default function AppRouter() {
     return (
@@ -101,9 +102,16 @@ export default function AppRouter() {
             />
 
             <Route 
-                path = "/profile/:userId"
+                path = "/account"
                 element = {
-                    <Profile />
+                    <Profile/>
+                }
+            />
+
+            <Route 
+                path = "/Customize_account/:userId"
+                element = {
+                    <ProfileCustomization />
                 }
             />
 
