@@ -15,20 +15,20 @@ const MainPage = () => {
         
 
         {/*Transparent Header*/}
-        <div className="absolute top-0 left-0 w-full flex justify-between py-4 text-white bg-transparent">
+        <div className="absolute top-0 left-0 w-full flex justify-between py-4 text-white bg-transparent z-10">
             <div className="px-8">
                 <p className="text-2xl font-semibold">LOGO HERE</p>
             </div>
 
             <div className="px-8 space-x-8 flex self-center">
-                <p>Rent</p>
-                <p>About</p>
-                <p>List Your Car</p>
+                <a href="/rental">Rent</a>
+                <a href="">About</a>
+                <a href="">List Your Car</a>
             </div>
 
             <div className="px-8 space-x-8 flex self-center">
-                <p>Sign Up</p>
-                <p>Log In</p>
+                <a href="/signup">Sign Up</a>
+                <a href="/login">Log In</a>
             </div>
         </div>
 
