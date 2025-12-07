@@ -1,12 +1,13 @@
 import express from "express";
-import { getUsers, createUser, updateUser, deleteUser, getUserById } from "../controllers/userController.js";
+import { getUsers, getUserById, createUser, updateUser, deleteUser } from "../controllers/userController.js";
+import { uploadProfilePhotos } from "../middleware/upload.js";
 
 const router = express.Router();
 
 router.get("/", getUsers);
-router.post("/", createUser);
 router.get("/:id", getUserById);
-router.put("/:id", updateUser);
+router.post("/", uploadProfilePhotos.single('selfiePhoto'), createUser);
+router.put("/:id", uploadProfilePhotos.single('selfiePhoto'), updateUser);
 router.delete("/:id", deleteUser);
 
 export default router;
