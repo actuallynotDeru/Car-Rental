@@ -17,6 +17,7 @@ import BookingApplicationPage from './pages/BookingApplication'
 import LoginPage from './pages/LoginForm'
 import SignupPage from './pages/SignupForm'
 import Profile from './pages/ProfilePage'
+import PaymentPage from './pages/Payment'
 
 export default function AppRouter() {
     return (
@@ -98,6 +99,13 @@ export default function AppRouter() {
                 path = "/products/:carId"
                 element = {
                     <Products />
+                }
+            />
+
+            <Route 
+                path = "/payment"
+                element = {
+                    <PaymentPage />
                 }
             />
 
