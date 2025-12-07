@@ -1,12 +1,13 @@
 import express from "express";
-import { getCars, createCar, updateCar, deleteCar, getCarById } from "../controllers/carController.js";
+import { getCars, getCarById, createCar, updateCar, deleteCar } from "../controllers/carController.js";
+import { uploadCarImages } from "../middleware/upload.js";
 
 const router = express.Router();
 
 router.get("/", getCars);
-router.post("/", createCar);
-router.get("/:id", getCarById)
-router.put("/:id", updateCar);
+router.get("/:id", getCarById);
+router.post("/", uploadCarImages.array('images', 10), createCar); // Upload up to 10 images
+router.put("/:id", uploadCarImages.array('images', 10), updateCar);
 router.delete("/:id", deleteCar);
 
 export default router;

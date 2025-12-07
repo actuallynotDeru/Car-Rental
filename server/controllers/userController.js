@@ -1,6 +1,5 @@
 import User from "../models/User.js";
 
-//get all users
 export const getUsers = async(req, res) => {
     try {
         const users = await User.find();
@@ -20,10 +19,16 @@ export const getUserById = async(req, res) => {
     }
 }
 
-//create a user
 export const createUser = async(req, res) => {
     try {
-        const user = new User(req.body);
+        const userData = req.body;
+        
+        // If selfie uploaded, save path
+        if (req.file) {
+            userData.selfiePhoto = `/uploads/profiles/${req.file.filename}`;
+        }
+        
+        const user = new User(userData);
         await user.save();
         res.status(201).json(user);
     } catch(err) {
@@ -31,17 +36,23 @@ export const createUser = async(req, res) => {
     }
 };
 
-//update a user
 export const updateUser = async(req, res) => {
     try {
-        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const userData = req.body;
+        
+        // If new selfie uploaded
+        if (req.file) {
+            userData.selfiePhoto = `/uploads/profiles/${req.file.filename}`;
+        }
+        
+        const user = await User.findByIdAndUpdate(req.params.id, userData, { new: true });
+        if(!user) return res.status(404).json({ message: "User not found" });
         res.json(user);
-    } catch (err) {
+    } catch(err) {
         res.status(400).json({ message: err.message });
     }
 };
 
-//delete a user
 export const deleteUser = async(req, res) => {
     try {
         await User.findByIdAndDelete(req.params.id);

@@ -3,33 +3,27 @@ import {
     getAllApplications,
     getApplicationById,
     getApplicationsByUser,
-    submitApplication,
+    createApplication,
     reviewApplication,
     updateApplication,
-    deleteApplication
+    deleteApplication,
 } from "../controllers/carOwnerApplicationController.js";
+import { uploadBusinessDocuments } from "../middleware/upload.js";
 
 const router = express.Router();
 
-// Get all applications (admin)
+// Use .fields() to handle both drivingLicense and businessLicense
+const uploadAppDocs = uploadBusinessDocuments.fields([
+  { name: 'drivingLicense', maxCount: 1 },
+  { name: 'businessLicense', maxCount: 1 }
+]);
+
 router.get("/", getAllApplications);
-
-// Get application by ID
 router.get("/:id", getApplicationById);
-
-// Get applications by user ID
 router.get("/user/:userId", getApplicationsByUser);
-
-// Submit new application
-router.post("/", submitApplication);
-
-// Review application (approve/reject)
+router.post("/", uploadAppDocs, createApplication);
 router.patch("/:id/review", reviewApplication);
-
-// Update application
-router.put("/:id", updateApplication);
-
-// Delete application
+router.put("/:id", uploadAppDocs, updateApplication);
 router.delete("/:id", deleteApplication);
 
 export default router;
