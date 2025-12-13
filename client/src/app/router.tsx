@@ -131,7 +131,7 @@ export default function AppRouter() {
             />
 
             <Route 
-                path = "/fleet"
+                path = "/fleet/:userId"
                 element = {
                     <FleetPage />
                 }

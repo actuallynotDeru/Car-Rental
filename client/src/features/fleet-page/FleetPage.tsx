@@ -1,30 +1,29 @@
-"use client"
-
 import type React from "react"
-import { useState, useMemo } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useMemo, useEffect } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"
-import { mockCars, mockUsers, mockBookings } from "@/lib/mock-data"
-import { Car, Plus, Search, Edit2, Trash2, Fuel, Users, Settings2, Star, TrendingUp, Calendar, ArrowLeft } from "lucide-react"
+import { Car, Plus, Search, Edit2, Trash2, Fuel, Users, Settings2, Star, TrendingUp, Calendar, ArrowLeft, Loader2 } from "lucide-react"
 import StatCard from "./components/stat-cards"
 import EditModal from "./components/edit-modal"
+import { FleetAPI } from "./api/fleet.api"
+import type { Car as CarType } from "./types/fleet.types"
 
 export default function FleetPage() {
-  // Mock current car owner (Sarah Johnson - ownerId: "2")
-  const currentOwner = mockUsers.find((u) => u.id === "2")!
+  // Mock current car owner - Replace with actual auth
+  const { userId } = useParams<{ userId: string }>();
+  const currentOwnerId = userId // Replace with actual user ID from auth
   const navigate = useNavigate()
 
-  // Get only cars owned by the current user
-  const [ownerCars, setOwnerCars] = useState(mockCars.filter((car) => car.ownerId === currentOwner.id))
-
+  const [ownerCars, setOwnerCars] = useState<CarType[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
-  const [editingCar, setEditingCar] = useState<(typeof mockCars)[0] | null>(null)
+  const [editingCar, setEditingCar] = useState<CarType | null>(null)
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [addDialogOpen, setAddDialogOpen] = useState(false)
@@ -40,13 +39,35 @@ export default function FleetPage() {
     status: "Available",
   })
 
+  // Fetch cars on mount
+  useEffect(() => {
+    const fetchCars = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        
+        if(!currentOwnerId) {
+          throw new Error("No owner Id");
+        }
+        
+        const data = await FleetAPI.getCarsByOwner(currentOwnerId)
+        setOwnerCars(data)
+      } catch (err) {
+        setError("Failed to load your fleet. Please try again.")
+        console.error("Error fetching fleet:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCars()
+  }, [currentOwnerId])
+
   // Calculate stats
   const totalCars = ownerCars.length
   const availableCars = ownerCars.filter((c) => c.status === "Available").length
-  const totalBookings = mockBookings.filter((b) => b.ownerId === currentOwner.id).length
-  const totalRevenue = mockBookings
-    .filter((b) => b.ownerId === currentOwner.id && b.status === "Completed")
-    .reduce((sum, b) => sum + b.totalPrice, 0)
+  const totalBookings = 0 // This would need booking data
+  const totalRevenue = 0 // This would need booking data
 
   const stats = [
     {
@@ -105,7 +126,7 @@ export default function FleetPage() {
     setEditingCar(null)
   }
 
-  const openEditModal = (car: (typeof mockCars)[0]) => {
+  const openEditModal = (car: CarType) => {
     setEditingCar(car)
     setFormData({
       name: car.name,
@@ -120,32 +141,9 @@ export default function FleetPage() {
     setEditDialogOpen(true)
   }
 
-  const handleSave = () => {
-    if (editingCar) {
-      setOwnerCars((prev) =>
-        prev.map((car) =>
-          car.id === editingCar.id
-            ? {
-                ...car,
-                name: formData.name,
-                price: Number(formData.price),
-                carDetails: {
-                  seats: Number(formData.seats),
-                  transmission: formData.transmission,
-                  fuelType: formData.fuelType,
-                  plateNumber: formData.plateNumber,
-                },
-                image: formData.image || car.image,
-                status: formData.status as "Available" | "Unavailable",
-              }
-            : car,
-        ),
-      )
-      setEditDialogOpen(false)
-    } else {
-      const newCar = {
-        id: `${Date.now()}`,
-        ownerId: currentOwner.id,
+  const handleSave = async () => {
+    try {
+      const carData = {
         name: formData.name,
         price: Number(formData.price),
         carDetails: {
@@ -154,20 +152,75 @@ export default function FleetPage() {
           fuelType: formData.fuelType,
           plateNumber: formData.plateNumber,
         },
-        rating: 5.0,
-        image: formData.image || "/classic-red-convertible.png",
+        image: formData.image || "/placeholder-car.png",
         status: formData.status as "Available" | "Unavailable",
-        createdAt: new Date(),
       }
-      setOwnerCars((prev) => [...prev, newCar])
-      setAddDialogOpen(false)
+
+      if (editingCar) {
+        // Update existing car
+        const updated = await FleetAPI.updateCar(editingCar._id!, carData)
+        setOwnerCars((prev) =>
+          prev.map((car) => (car._id === editingCar._id ? updated : car))
+        )
+        setEditDialogOpen(false)
+      } else {
+        // Create new car
+        const newCar = await FleetAPI.createCar({
+          ...carData,
+          ownerId: currentOwnerId,
+          rating: 5.0,
+        })
+        setOwnerCars((prev) => [...prev, newCar])
+        setAddDialogOpen(false)
+      }
+      resetForm()
+    } catch (err) {
+      console.error("Error saving car:", err)
+      alert("Failed to save car. Please try again.")
     }
-    resetForm()
   }
 
-  const handleDelete = (carId: string) => {
-    setOwnerCars((prev) => prev.filter((car) => car.id !== carId))
-    setDeleteConfirmId(null)
+  const handleDelete = async (carId: string) => {
+    try {
+      await FleetAPI.deleteCar(carId)
+      setOwnerCars((prev) => prev.filter((car) => car._id !== carId))
+      setDeleteConfirmId(null)
+    } catch (err) {
+      console.error("Error deleting car:", err)
+      alert("Failed to delete car. Please try again.")
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-slate-600">Loading your fleet...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+        <div className="max-w-7xl mx-auto">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/")}
+            className="mb-4 gap-2 hover:cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </Button>
+          <Card className="p-12 text-center">
+            <p className="text-destructive mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()}>Try Again</Button>
+          </Card>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -214,28 +267,27 @@ export default function FleetPage() {
                     className="pl-10 w-full sm:w-64"
                   />
                 </div>
-                <Select
-                  value = {statusFilter}
-                  onValueChange = {(e) => setStatusFilter(e)}
-                >
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger>
-                    <SelectValue placeholder = "All Status" />
+                    <SelectValue placeholder="All Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value = "all">All Status</SelectItem>
-                    <SelectItem value = "Available">Available</SelectItem>
-                    <SelectItem value = "Unavailable">Unavailable</SelectItem>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="Available">Available</SelectItem>
+                    <SelectItem value="Unavailable">Unavailable</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <Dialog onOpenChange={(open) => { setAddDialogOpen(open); if (!open) resetForm(); }}>
-                <DialogTrigger asChild>
-                  <Button className="gap-2 w-full md:w-auto">
-                    <Plus className="w-4 h-4" />
-                    Add New Car
-                  </Button>
-                </DialogTrigger>
-              </Dialog>
+              <Button
+                className="gap-2 w-full md:w-auto"
+                onClick={() => {
+                  resetForm()
+                  setAddDialogOpen(true)
+                }}
+              >
+                <Plus className="w-4 h-4" />
+                Add New Car
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -252,7 +304,7 @@ export default function FleetPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCars.map((car) => (
-              <Card key={car.id} className="shadow-sm overflow-hidden hover:shadow-2xl transition-shadow border border-gray-300">
+              <Card key={car._id} className="shadow-sm overflow-hidden hover:shadow-2xl transition-shadow border border-gray-300">
                 <div className="relative">
                   <img
                     src={car.image || "/placeholder.svg?height=200&width=400&query=car"}
@@ -308,9 +360,9 @@ export default function FleetPage() {
                         <Edit2 className="w-4 h-4" />
                         Edit
                       </Button>
-                      {deleteConfirmId === car.id ? (
+                      {deleteConfirmId === car._id ? (
                         <div className="flex items-center gap-1">
-                          <Button variant="destructive" size="sm" onClick={() => handleDelete(car.id)}>
+                          <Button variant="destructive" size="sm" onClick={() => handleDelete(car._id!)}>
                             Confirm
                           </Button>
                           <Button variant="ghost" size="sm" onClick={() => setDeleteConfirmId(null)}>
@@ -321,7 +373,7 @@ export default function FleetPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setDeleteConfirmId(car.id)}
+                          onClick={() => setDeleteConfirmId(car._id!)}
                           className="text-red-600 hover:text-red-700 hover:bg-red-50"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -336,20 +388,26 @@ export default function FleetPage() {
         )}
       </div>
 
-      {/* Add Dialog Component */}
+      {/* Add Dialog */}
       <EditModal
         open={addDialogOpen}
-        onOpenChange={(open) => { setAddDialogOpen(open); if (!open) resetForm(); }}
+        onOpenChange={(open) => {
+          setAddDialogOpen(open)
+          if (!open) resetForm()
+        }}
         formData={formData}
         onInputChange={handleInputChange}
         onSave={handleSave}
         mode="add"
       />
 
-      {/* Edit Dialog Component */}
+      {/* Edit Dialog */}
       <EditModal
         open={editDialogOpen}
-        onOpenChange={(open) => { setEditDialogOpen(open); if (!open) resetForm(); }}
+        onOpenChange={(open) => {
+          setEditDialogOpen(open)
+          if (!open) resetForm()
+        }}
         formData={formData}
         onInputChange={handleInputChange}
         onSave={handleSave}

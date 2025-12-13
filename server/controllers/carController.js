@@ -1,65 +1,85 @@
 import Car from "../models/Cars.js";
 
-export const getCars = async(req, res) => {
+// Get all cars by owner ID
+export const getCarsByOwnerId = async (req, res) => {
     try {
-        const cars = await Car.find();
+        const { ownerId } = req.params;
+        const cars = await Car.find({ ownerId }).populate('ownerId', 'fullName email');
+        
+        if (!cars || cars.length === 0) {
+            return res.status(404).json({ message: "No cars found for this owner" });
+        }
+        
         res.json(cars);
-    } catch(err) {
+    } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
 
-export const getCarById = async(req, res) => {
+// Get all cars
+export const getAllCars = async (req, res) => {
     try {
-        const cars = await Car.findById(req.params.id);
-        if(!cars) return res.status(404).json({ message: "Car not found" });
-        res.status(200).json(cars);
-    } catch(err) {
+        const cars = await Car.find().populate('ownerId', 'fullName email');
+        res.json(cars);
+    } catch (err) {
         res.status(500).json({ message: err.message });
     }
-}
+};
 
-export const createCar = async(req, res) => {
+// Get single car by ID
+export const getCarById = async (req, res) => {
     try {
-        const carData = req.body;
-        
-        // If images uploaded, save their paths
-        if (req.files && req.files.length > 0) {
-            carData.images = req.files.map(file => `/uploads/cars/${file.filename}`);
-            carData.image = carData.images[0]; // First image as main
+        const car = await Car.findById(req.params.id).populate('ownerId', 'fullName email');
+        if (!car) {
+            return res.status(404).json({ message: "Car not found" });
         }
-        
-        const car = new Car(carData);
+        res.json(car);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// Create a new car
+export const createCar = async (req, res) => {
+    try {
+        const car = new Car(req.body);
         await car.save();
         res.status(201).json(car);
-    } catch(err) {
+    } catch (err) {
         res.status(400).json({ message: err.message });
     }
 };
 
-export const updateCar = async(req, res) => {
+// Update a car
+export const updateCar = async (req, res) => {
     try {
-        const carData = req.body;
+        const car = await Car.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true, runValidators: true }
+        );
         
-        // If new images uploaded
-        if (req.files && req.files.length > 0) {
-            carData.images = req.files.map(file => `/uploads/cars/${file.filename}`);
-            carData.image = carData.images[0];
+        if (!car) {
+            return res.status(404).json({ message: "Car not found" });
         }
         
-        const car = await Car.findByIdAndUpdate(req.params.id, carData, { new: true });
-        if(!car) return res.status(404).json({ message: "Car not found" });
         res.json(car);
-    } catch(err) {
+    } catch (err) {
         res.status(400).json({ message: err.message });
     }
 };
 
-export const deleteCar = async(req, res) => {
+// Delete a car
+export const deleteCar = async (req, res) => {
     try {
-        await Car.findByIdAndDelete(req.params.id);
-        res.json({ message: "Car deleted" });
-    } catch(err) {
+        const car = await Car.findByIdAndDelete(req.params.id);
+        
+        if (!car) {
+            return res.status(404).json({ message: "Car not found" });
+        }
+        
+        res.json({ message: "Car deleted successfully" });
+    } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
