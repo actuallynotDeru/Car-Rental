@@ -1,4 +1,3 @@
-// client/src/features/fleet-page/api/fleet.api.ts
 import { API_BASE_URL } from "@/config/apiURL";
 import axios from "axios";
 import type { Car } from "../types/fleet.types";

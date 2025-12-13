@@ -1,5 +1,5 @@
 import express from "express";
-import { getBookings, getBookingById, createBooking, updateBooking, deleteBooking } from "../controllers/bookingController.js";
+import { getAllBookings, getBookingById, createBooking, updateBooking, deleteBooking, getBookingsByOwner } from "../controllers/bookingController.js";
 import multer from "multer";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -43,7 +43,8 @@ const uploadBookingDocs = multer({
 
 const router = express.Router();
 
-router.get("/", getBookings);
+router.get("/", getAllBookings);
+router.get("/owner/:ownerId", getBookingsByOwner);
 router.get("/:id", getBookingById);
 router.post("/", uploadBookingDocs, createBooking);
 router.put("/:id", uploadBookingDocs, updateBooking);

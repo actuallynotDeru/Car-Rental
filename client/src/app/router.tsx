@@ -138,7 +138,7 @@ export default function AppRouter() {
             />
             
             <Route 
-            path = "/booking/review"
+            path = "/booking/review/:userId"
             element = {
               <BookingApplicationPage />
             }
