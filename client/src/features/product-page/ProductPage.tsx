@@ -1,17 +1,83 @@
 import Header from "@/components/Header";
-import FeatureCard from "./components/FeatureCard";
-import CarRules from "./components/CarRulesCard";
 import CustomerReview from "./components/CustomerReview";
-import { MapPin, Star, Users, Settings, Fuel, MoveLeft, MoveRight } from "lucide-react";
+import { MapPin, Star, Users, Settings, Fuel, MoveLeft, MoveRight, Loader2 } from "lucide-react";
+import { useEffect,useState } from "react";
+import { useParams } from "react-router-dom";
+
+import { getCarById } from "./api/product.api";
+import { getOwnerById } from "./api/owner.api";
+import type { Car } from "./types/product.types";
+import type { Owner } from "./types/product.types";
 
 const ProductPage = () => {
+
+  //get ID
+  const { carId } = useParams<{ carId: string }>();
+
+  //setup state
+  const [car, setCar] = useState<Car | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [owner, setOwner] = useState<Owner | null>(null);
+
+  //fetch
+  useEffect(() => {
+      const fetchData = async () => {
+        if (!carId) return;
+        
+        console.log(carId)
+
+        try {
+          setLoading(true);
+          const carData = await getCarById(carId);
+          setCar(carData);
+          if (carData?.ownerId) {
+            const ownerIdToFetch = carData.ownerId._id || carData.ownerId; 
+            if (typeof ownerIdToFetch === 'string') {
+                const ownerRes = await getOwnerById(ownerIdToFetch);
+                setOwner(ownerRes);
+            }else{
+                setOwner(carData.ownerId);
+            }
+          }
+        } catch (err) {
+          console.error(err);
+          setError("Failed to load car details.");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchData();
+    }, [carId]);
+
+    if (loading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="animate-spin text-blue-500" size={48} />
+      </div>
+    );
+  }
+
+  if (error || !car) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center text-red-500">
+        {error || "Car not found"}
+      </div>
+    );
+  }
+
   return (
     <>
       <Header />
 
       {/* Carousel Placeholder */}
       <div className="w-full h-[480px] bg-gray-200 flex items-center justify-center">
-        <p className="text-gray-500 text-lg">[Car Images Carousel]</p>
+        {car.image ? (
+            <img src={car.image} alt={car.name} className="w-full h-full object-cover" /> //fix later
+        ) : (
+            <p className="text-gray-500 text-lg">[No Image Available]</p>
+        )}
       </div>
 
       {/* Main Content */}
@@ -21,24 +87,24 @@ const ProductPage = () => {
           <div className="flex-1 flex flex-col gap-8">
             {/* Car Name */}
             <div>
-              <h1 className="text-4xl font-semibold text-gray-900">2024 Tesla Model Y</h1>
+              <h1 className="text-4xl font-semibold text-gray-900">{car.name}</h1>
             </div>
 
             {/* Location & Car Details */}
             <div className="flex justify-between items-center flex-wrap gap-4">
               <div className="flex items-center gap-2 text-gray-600">
                 <MapPin size={18} />
-                <p>Location, Location, Location</p>
+                <p>Location, Location, Location</p> {/* update later */}
               </div>
               <div className="flex flex-wrap items-center gap-6 text-gray-600">
                 <div className="flex items-center gap-2">
-                  <Users size={18} /> <span>5 Seats</span>
+                  <Users size={18} /> <span>{car.carDetails.seats}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Settings size={18} /> <span>Automatic</span>
+                  <Settings size={18} /> <span>{car.carDetails.transmission}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Fuel size={18} /> <span>Electric</span>
+                  <Fuel size={18} /> <span>{car.carDetails.fuelType}</span>
                 </div>
               </div>
             </div>
@@ -48,7 +114,7 @@ const ProductPage = () => {
               <h2 className="text-2xl font-semibold text-gray-900">Hosted By</h2>
               <div className="flex items-center gap-4 mt-3">
                 <div className="w-[70px] h-[70px] rounded-full bg-gray-300" />
-                <span className="text-lg font-medium text-gray-800">Machacon, Jian Bryce</span>
+                <span className="text-lg font-medium text-gray-800">{owner?.fullName}</span>
               </div>
             </div>
 
@@ -60,30 +126,6 @@ const ProductPage = () => {
               </p>
             </div>
 
-            {/* Features */}
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-3">Features</h2>
-              <div className="flex flex-wrap gap-2">
-                <FeatureCard />
-                <FeatureCard />
-                <FeatureCard />
-                <FeatureCard />
-                <FeatureCard />
-              </div>
-            </div>
-
-            {/* Car Rules */}
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-3">Car Rules</h2>
-              <div className="flex flex-wrap gap-4 max-w-md">
-                <CarRules />
-                <CarRules />
-                <CarRules />
-                <CarRules />
-                <CarRules />
-                <CarRules />
-              </div>
-            </div>
           </div>
 
           {/* Right: Rent Now Card */}
@@ -92,7 +134,7 @@ const ProductPage = () => {
               <div>
                 <h2 className="text-lg font-semibold">Rental Price</h2>
                 <div className="flex items-baseline gap-2 mt-1">
-                  <p className="text-2xl font-bold text-[#1591EA]">₱999,999</p>
+                  <p className="text-2xl font-bold text-[#1591EA]">{car.price}</p>
                   <span className="text-gray-500 text-xs">per day</span>
                 </div>
               </div>
