@@ -4,87 +4,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { X, Search, Calendar, DollarSign, User, Car, FileText, CheckCircle, XCircle, Clock, Eye, ArrowLeft } from "lucide-react"
+import { Dialog, DialogContent, DialogTrigger} from "@/components/ui/dialog"
+import { X, Search, Calendar, User, Car, FileText, CheckCircle, XCircle, Eye, ArrowLeft, Check } from "lucide-react"
 import { calculateDays, formatDate, getStatusBadge } from "./utils/booking-review.utils"
-import { DialogDescription } from "@radix-ui/react-dialog"
 import { useNavigate, useParams } from "react-router-dom"
 import DetailsModal from "./components/details-modal";
 import { getOwnerBookings, updateBookingStatus } from "./api/booking-review.api"
 import type { Booking } from "./types/booking-review.types"
-import { API_BASE_URL } from "@/config/apiURL"
-
-// Mock data for rental applications
-const mockApplications = [
-  {
-    id: "1",
-    customerId: "cust_001",
-    customerName: "John Doe",
-    customerEmail: "john.doe@email.com",
-    customerPhone: "+1234567890",
-    carId: "car_001",
-    carName: "Toyota Camry 2023",
-    carPlate: "ABC-1234",
-    pickupDate: "2025-12-05",
-    returnDate: "2025-12-10",
-    totalPrice: 250,
-    paymentProof: "/uploads/payment_proof_1.jpg",
-    idPhoto: "/uploads/id_photo_1.jpg",
-    status: "Pending",
-    createdAt: "2025-11-28T10:30:00",
-  },
-  {
-    id: "2",
-    customerId: "cust_002",
-    customerName: "Jane Smith",
-    customerEmail: "jane.smith@email.com",
-    customerPhone: "+1234567891",
-    carId: "car_002",
-    carName: "Honda Civic 2024",
-    carPlate: "XYZ-5678",
-    pickupDate: "2025-12-08",
-    returnDate: "2025-12-12",
-    totalPrice: 200,
-    paymentProof: "/uploads/payment_proof_2.jpg",
-    idPhoto: "/uploads/id_photo_2.jpg",
-    status: "Pending",
-    createdAt: "2025-11-29T14:20:00",
-  },
-  {
-    id: "3",
-    customerId: "cust_003",
-    customerName: "Mike Johnson",
-    customerEmail: "mike.j@email.com",
-    customerPhone: "+1234567892",
-    carId: "car_001",
-    carName: "Toyota Camry 2023",
-    carPlate: "ABC-1234",
-    pickupDate: "2025-12-15",
-    returnDate: "2025-12-18",
-    totalPrice: 150,
-    paymentProof: "/uploads/payment_proof_3.jpg",
-    idPhoto: "/uploads/id_photo_3.jpg",
-    status: "Confirmed",
-    createdAt: "2025-11-27T09:15:00",
-  },
-  {
-    id: "4",
-    customerId: "cust_004",
-    customerName: "Sarah Williams",
-    customerEmail: "sarah.w@email.com",
-    customerPhone: "+1234567893",
-    carId: "car_003",
-    carName: "Ford Mustang 2023",
-    carPlate: "DEF-9012",
-    pickupDate: "2025-12-03",
-    returnDate: "2025-12-07",
-    totalPrice: 400,
-    paymentProof: "/uploads/payment_proof_4.jpg",
-    idPhoto: "/uploads/id_photo_4.jpg",
-    status: "Cancelled",
-    createdAt: "2025-11-26T16:45:00",
-  },
-];
 
 const BookingApplication = () => {
   const [applications, setApplications] = useState<Booking[]>([]);
@@ -95,13 +21,10 @@ const BookingApplication = () => {
     car: "all",
   });
   const [selectedApplication, setSelectedApplication] = useState(null);
-  const [viewDetailsDialog, setViewDetailsDialog] = useState(false);
-  const [actionDialog, setActionDialog] = useState({ open: false, action: null, application: null })
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
   const currentOwnerId = userId;
   
-  // Fetch bookings on mount
   useEffect(() => {
     if(!currentOwnerId) return
     
@@ -119,7 +42,6 @@ const BookingApplication = () => {
     fetchBookings();
   }, [currentOwnerId]);
 
-  // Handle approve
   const handleApprove = async (bookingId: string) => {
     try {
       await updateBookingStatus(bookingId, "Confirmed");
@@ -132,8 +54,20 @@ const BookingApplication = () => {
       console.error("Failed to approve:", error);
     }
   };
+  
+  const handleCompleted = async(bookingId: string) => {
+    try {
+      await updateBookingStatus(bookingId, "Completed");
+      setApplications((prev) =>
+        prev.map((app) =>
+          app._id === bookingId ? { ...app, status: "Completed" } : app
+        )
+      );
+    } catch (error) {
+      console.error("Failed to complete: ", error);
+    }
+  }
 
-  // Handle reject
   const handleReject = async (bookingId: string) => {
     try {
       await updateBookingStatus(bookingId, "Cancelled");
@@ -191,7 +125,7 @@ const BookingApplication = () => {
   }, [applications]);
   
   return(
-    <div className = "flex-1 overflow-auto p-16">
+    <div className = "flex-1 overflow-auto p-12">
       <Button
         variant="ghost"
         onClick={() => navigate("/")}
@@ -314,13 +248,13 @@ const BookingApplication = () => {
                   <div className = "flex items-center gap-2 text-sm">
                     <Calendar className = "size-4 text-muted-foreground" />
                     <span className = "text-muted-foreground">Pickup:</span>
-                    <span className = "font-medium">{formatDate(application.pickupDate)}</span>
+                    <span className = "font-medium">{formatDate(application.pickupDate.toString())}</span>
                   </div>
 
                   <div className = "flex items-center gap-2 text-sm">
                     <Calendar className = "size-4 text-muted-foreground" />
                     <span className = "text-muted-foreground">Return:</span>
-                    <span className = "font-medium">{formatDate(application.returnDate)}</span>
+                    <span className = "font-medium">{formatDate(application.returnDate.toString())}</span>
                   </div>
 
                   <div className = "flex items-center gap-2 text-sm">
@@ -373,6 +307,19 @@ const BookingApplication = () => {
                       >
                         <XCircle className="size-4 mr-1" />
                         Reject
+                      </Button>
+                    </>
+                  )}
+                  
+                  {application.status === "Confirmed" && (
+                    <>
+                      <Button 
+                        size="sm"
+                        className="flex-1 bg-blue-600 hover:bg-blue-700"
+                        onClick={() => handleCompleted(application._id!)}
+                      >
+                        <Check className = "size-4 mr-1" />
+                        Completed
                       </Button>
                     </>
                   )}
