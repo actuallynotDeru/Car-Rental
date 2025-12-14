@@ -4,11 +4,13 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import cors from "cors"
+import cookieParser from "cookie-parser";
 
 import userRoutes from "./routes/userRoutes.js";
 import carRoutes from "./routes/carRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import carOwnerApplicationRoutes from "./routes/carOwnerApplicationRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 dotenv.config();
 
@@ -23,9 +25,13 @@ app.use(cors({
 }))
 
 app.use(express.json());
+app.use(cookieParser());
 
 // Serve uploaded files as static content
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Authentication routes
+app.use("/api/auth", authRoutes);
 
 app.use("/api/users", userRoutes);
 app.use("/api/cars", carRoutes);
