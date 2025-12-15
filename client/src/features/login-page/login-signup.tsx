@@ -16,12 +16,54 @@ import {
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { AuthAPI } from './api/auth.api'
+import type { LoginFormData } from './types/auth.types'
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-    const Navigate = useNavigate();
+  const navigate = useNavigate()
+  const [formData, setFormData] = useState<LoginFormData>({
+    email: '',
+    password: ''
+  })
+  const [error, setError] = useState<string>('')
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target
+    setFormData(prev => ({ ...prev, [id]: value }))
+    if (error) setError('')
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setIsLoading(true)
+
+    try {
+      const response = await AuthAPI.login({
+        email: formData.email,
+        password: formData.password
+      })
+
+      // Navigate based on user role
+      if (response.user.role === 'Admin') {
+        navigate('/admin')
+      } else if (response.user.role === 'CarOwner') {
+        navigate(`/fleet/${response.user._id}`)
+      } else {
+        navigate('/')
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Login failed. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -32,7 +74,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
                 <Button variant="outline" type="button">
@@ -57,12 +99,21 @@ export function LoginForm({
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or continue with
               </FieldSeparator>
+
+              {error && (
+                <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
+                  {error}
+                </div>
+              )}
+
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
                   type="email"
                   placeholder="m@example.com"
+                  value={formData.email}
+                  onChange={handleInputChange}
                   required
                 />
               </Field>
@@ -76,12 +127,23 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                  id="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? 'Logging in...' : 'Login'}
+                </Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a onClick={() => Navigate("/signup")}>Sign up</a>
+                  Don&apos;t have an account?{" "}
+                  <a onClick={() => navigate("/signup")} className="cursor-pointer hover:underline">
+                    Sign up
+                  </a>
                 </FieldDescription>
               </Field>
             </FieldGroup>

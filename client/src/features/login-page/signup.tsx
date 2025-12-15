@@ -1,169 +1,150 @@
 import type React from "react"
-
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useNavigate } from "react-router-dom"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldDescription,
+} from "@/components/ui/field"
 
-
-
+import { AuthAPI } from "./api/auth.api"
 
 export function SignupForm() {
-    const Navigate = useNavigate()
+  const navigate = useNavigate()
 
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string>("")
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     password: "",
-    confirmPassword: "",
+    phone: "",
+    street: "",
+    city: "",
+    province: "",
+    country: "",
+    fullAddress: "",
   })
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [success, setSuccess] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }))
-    }
+    const { id, value } = e.target
+    setFormData(prev => ({ ...prev, [id]: value }))
+    if (error) setError("")
   }
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {}
-
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required"
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required"
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email"
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required"
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters"
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (!validateForm()) return
-
     setIsLoading(true)
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      setSuccess(true)
-      setFormData({ fullName: "", email: "", password: "", confirmPassword: "" })
+    setError("")
 
-      setTimeout(() => setSuccess(false), 3000)
+    try {
+      await AuthAPI.register(formData)
+      navigate("/login")
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Registration failed")
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      {success && (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
-          Account created successfully! Welcome aboard.
-        </div>
-      )}
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader className="text-center">
+        <CardTitle>Create an account</CardTitle>
+        <CardDescription>Fill in your details to continue</CardDescription>
+      </CardHeader>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <Label htmlFor="fullName" className="text-sm font-medium">
-            Full Name
-          </Label>
-          <Input
-            id="fullName"
-            name="fullName"
-            type="text"
-            placeholder="John Doe"
-            value={formData.fullName}
-            onChange={handleChange}
-            disabled={isLoading}
-            className="mt-1.5"
-          />
-          {errors.fullName && <p className="mt-1 text-xs text-destructive">{errors.fullName}</p>}
-        </div>
+      <CardContent>
+        <form onSubmit={handleSubmit}>
+          <FieldGroup>
 
-        <div>
-          <Label htmlFor="email" className="text-sm font-medium">
-            Email Address
-          </Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="you@example.com"
-            value={formData.email}
-            onChange={handleChange}
-            disabled={isLoading}
-            className="mt-1.5"
-          />
-          {errors.email && <p className="mt-1 text-xs text-destructive">{errors.email}</p>}
-        </div>
+            {error && (
+              <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
+                {error}
+              </div>
+            )}
 
-        <div>
-          <Label htmlFor="password" className="text-sm font-medium">
-            Password
-          </Label>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            placeholder="••••••••"
-            value={formData.password}
-            onChange={handleChange}
-            disabled={isLoading}
-            className="mt-1.5"
-          />
-          {errors.password && <p className="mt-1 text-xs text-destructive">{errors.password}</p>}
-          <p className="mt-1 text-xs text-muted-foreground">At least 8 characters</p>
-        </div>
+            <Field>
+              <FieldLabel htmlFor="fullName">Full Name</FieldLabel>
+              <Input id="fullName" value={formData.fullName} onChange={handleChange} required />
+            </Field>
 
-        <div>
-          <Label htmlFor="confirmPassword" className="text-sm font-medium">
-            Confirm Password
-          </Label>
-          <Input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            placeholder="••••••••"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            disabled={isLoading}
-            className="mt-1.5"
-          />
-          {errors.confirmPassword && <p className="mt-1 text-xs text-destructive">{errors.confirmPassword}</p>}
-        </div>
+            <Field>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <Input id="email" type="email" value={formData.email} onChange={handleChange} required />
+            </Field>
 
-        <Button type="submit" disabled={isLoading} className="w-full mt-6">
-          {isLoading ? "Creating account..." : "Create Account"}
-        </Button>
-      </form>
+            <Field>
+              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <Input id="password" type="password" value={formData.password} onChange={handleChange} required />
+            </Field>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
-        <a onClick={() => Navigate("/login")} className="font-medium hover:underline">
-          Sign in
-        </a>
-      </p>
-    </div>
+            <Field>
+              <FieldLabel htmlFor="phone">Phone</FieldLabel>
+              <Input id="phone" value={formData.phone} onChange={handleChange} required />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="street">Street</FieldLabel>
+              <Input id="street" value={formData.street} onChange={handleChange} required />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="city">City</FieldLabel>
+              <Input id="city" value={formData.city} onChange={handleChange} required />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="province">Province</FieldLabel>
+              <Input id="province" value={formData.province} onChange={handleChange} required />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="country">Country</FieldLabel>
+              <Input id="country" value={formData.country} onChange={handleChange} required />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="fullAddress">Full Address</FieldLabel>
+              <Input
+                id="fullAddress"
+                value={formData.fullAddress}
+                onChange={handleChange}
+                required
+              />
+            </Field>
+
+            <Field>
+              <Button type="submit" disabled={isLoading} className="w-full">
+                {isLoading ? "Creating account..." : "Create Account"}
+              </Button>
+              <FieldDescription className="text-center">
+                Already have an account?{" "}
+                <span
+                  onClick={() => navigate("/login")}
+                  className="cursor-pointer underline"
+                >
+                  Sign in
+                </span>
+              </FieldDescription>
+            </Field>
+
+          </FieldGroup>
+        </form>
+      </CardContent>
+    </Card>
   )
 }
