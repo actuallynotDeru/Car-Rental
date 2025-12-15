@@ -21,7 +21,12 @@ const uploadAppDocs = uploadBusinessDocuments.fields([
 router.get("/", getAllApplications);
 router.get("/:id", getApplicationById);
 router.get("/user/:userId", getApplicationsByUser);
-router.post("/", uploadAppDocs, createApplication);
+router.post("/", uploadBusinessDocuments.fields([
+  { name: 'drivingLicense', maxCount: 1 },
+  { name: 'businessLicense', maxCount: 1 },
+]),
+createApplication
+);
 router.patch("/:id/review", reviewApplication);
 router.put("/:id", uploadAppDocs, updateApplication);
 router.delete("/:id", deleteApplication);

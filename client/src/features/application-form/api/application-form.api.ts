@@ -1,32 +1,48 @@
-import { API_BASE_URL } from "@/config/apiURL";
-import axios from "axios";
-import type { ApplicationFormData } from "../types/application-form.types";
+import { API_BASE_URL } from "@/config/apiURL"
+import axios from "axios"
+import type { ApplicationRequest, Application } from "../types/application-form.types"
 
-export const submitCarOwnerApplication = async(formData: ApplicationFormData) => {
-  try {
-    const data = new FormData();
+const APPLICATION_API = `${API_BASE_URL}/car-owner-applications`
+
+export const ApplicationAPI = {
+  // Create new application
+  createApplication: async (data: ApplicationRequest): Promise<Application> => {
+    const formData = new FormData()
     
-    data.append('userId', formData.userId);
-    data.append('businessName', formData.businessName);
-    data.append('businessAddress', formData.businessAddress);
-    data.append('businessPhone', formData.businessPhone);
-    data.append('businessEmail', formData.businessEmail);
-    data.append('taxId', formData.taxId);
+    formData.append("userId", data.userId)
+    formData.append("businessName", data.businessName)
+    formData.append("businessAddress", data.businessAddress)
+    formData.append("businessPhone", data.businessPhone)
+    formData.append("businessEmail", data.businessEmail)
+    formData.append("taxId", data.taxId)
+    formData.append("description", data.description)
+    formData.append("drivingLicense", data.drivingLicense)
+    formData.append("businessLicense", data.businessLicense)
     
-    if(formData.description) {
-      data.append('description', formData.description);
-    }
+    const res = await axios.post(APPLICATION_API, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
     
-    data.append('drivingLicense', formData.drivingLicense);
-    data.append('businessLicense', formData.businessLicense);
-    
-    const res = await axios.post(`${API_BASE_URL}/car-owner-applications`, data);
-    return res.data;
-    
-  } catch(err: any) {
-    if(err.response) {
-      throw new Error(err.response.data.message || "Failed to submit application");
-    }
-    throw new Error("Network error. Please try again.");
-  }
+    return res.data
+  },
+
+  // Get application by ID
+  getApplicationById: async (id: string): Promise<Application> => {
+    const res = await axios.get(`${APPLICATION_API}/${id}`)
+    return res.data
+  },
+
+  // Get applications by user ID
+  getApplicationsByUser: async (userId: string): Promise<Application[]> => {
+    const res = await axios.get(`${APPLICATION_API}/user/${userId}`)
+    return res.data
+  },
+
+  // Get all applications
+  getAllApplications: async (): Promise<Application[]> => {
+    const res = await axios.get(APPLICATION_API)
+    return res.data
+  },
 }

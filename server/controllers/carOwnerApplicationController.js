@@ -1,5 +1,11 @@
 import CarOwnerApplication from "../models/CarOwnerApplication.js";
 import User from "../models/User.js";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const getAllApplications = async (req, res) => {
     try {
@@ -41,50 +47,92 @@ export const getApplicationsByUser = async (req, res) => {
 };
 
 export const createApplication = async (req, res) => {
-    try {
-        const applicationData = req.body;
-        
-        // Check if user exists
-        const user = await User.findById(applicationData.userId);
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        
-        // Check if user is already a CarOwner
-        if (user.role === "CarOwner") {
-            return res.status(400).json({ message: "User is already a car owner" });
-        }
-        
-        // Check if user already has a pending application
-        const existingApplication = await CarOwnerApplication.findOne({
-            userId: applicationData.userId,
-            status: "Pending"
-        });
-        
-        if (existingApplication) {
-            return res.status(400).json({ message: "User already has a pending application" });
-        }
-        
-        // Save uploaded document paths
-        if (req.files) {
-            if (req.files.drivingLicense) {
-                applicationData.drivingLicense = `/uploads/business/${req.files.drivingLicense[0].filename}`;
-            }
-            if (req.files.businessLicense) {
-                applicationData.businessLicense = `/uploads/business/${req.files.businessLicense[0].filename}`;
-            }
-        }
-        
-        const application = new CarOwnerApplication(applicationData);
-        await application.save();
-        
-        const populatedApplication = await CarOwnerApplication.findById(application._id)
-            .populate('userId', 'fullName email phone');
-            
-        res.status(201).json(populatedApplication);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
+  try {
+    console.log('=== CREATE APPLICATION DEBUG ===');
+    console.log('Files received:', req.files);
+    console.log('Body received:', req.body);
+    
+    // Access files via multer
+    const drivingLicenseFile = req.files['drivingLicense']?.[0];
+    const businessLicenseFile = req.files['businessLicense']?.[0];
+
+    if (!drivingLicenseFile || !businessLicenseFile) {
+      return res.status(400).json({ message: 'Both driving license and business license files are required' });
     }
+
+    // Log file paths to debug
+    console.log('Driving License Path:', drivingLicenseFile.path);
+    console.log('Business License Path:', businessLicenseFile.path);
+
+    // Check if files actually exist
+    if (!fs.existsSync(drivingLicenseFile.path)) {
+      console.error('Driving license file does not exist at:', drivingLicenseFile.path);
+      return res.status(500).json({ message: 'Failed to save driving license file' });
+    }
+    
+    if (!fs.existsSync(businessLicenseFile.path)) {
+      console.error('Business license file does not exist at:', businessLicenseFile.path);
+      return res.status(500).json({ message: 'Failed to save business license file' });
+    }
+
+    // Collect other form fields from req.body
+    const {
+      userId,
+      businessName,
+      businessAddress,
+      businessPhone,
+      businessEmail,
+      taxId,
+      description
+    } = req.body;
+
+    // Validate required fields
+    if (!userId || !businessName || !businessAddress || !businessPhone || !businessEmail || !taxId) {
+      return res.status(400).json({ message: 'All required fields must be provided' });
+    }
+
+    // Store the relative path from uploads folder
+    // Multer saves to uploads/business/, so we just need the filename
+    const drivingLicensePath = `/uploads/business/${drivingLicenseFile.filename}`;
+    const businessLicensePath = `/uploads/business/${businessLicenseFile.filename}`;
+
+    console.log('Saving to DB with paths:', {
+      drivingLicense: drivingLicensePath,
+      businessLicense: businessLicensePath
+    });
+
+    // Create application data
+    const applicationData = {
+      userId,
+      businessName,
+      businessAddress,
+      businessPhone,
+      businessEmail,
+      taxId,
+      description: description || '',
+      drivingLicense: drivingLicensePath,
+      businessLicense: businessLicensePath,
+    };
+
+    // Save to database
+    const application = await CarOwnerApplication.create(applicationData);
+    
+    console.log('Application created:', application._id);
+    
+    // Populate user data before sending response
+    const populatedApplication = await CarOwnerApplication.findById(application._id)
+      .populate('userId', 'fullName email phone');
+
+    res.status(201).json({ 
+      message: 'Application submitted successfully', 
+      application: populatedApplication 
+    });
+  } catch (err) {
+    console.error('=== CREATE APPLICATION ERROR ===');
+    console.error('Error details:', err);
+    console.error('Stack trace:', err.stack);
+    res.status(500).json({ message: err.message || 'Internal server error' });
+  }
 };
 
 export const reviewApplication = async (req, res) => {
