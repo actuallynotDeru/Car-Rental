@@ -27,8 +27,8 @@ export interface Application {
   businessPhone: string
   businessEmail: string
   taxId: string
-  drivingLicense: string
-  businessLicense: string
+  drivingLicense: File
+  businessLicense: File
   description: string
   status: string
   adminNotes: string

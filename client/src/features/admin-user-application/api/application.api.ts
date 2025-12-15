@@ -30,3 +30,16 @@ export async function getApplications(): Promise<Application[]> {
     throw new Error("Failed to fetch applicaitons");
   }
 }
+
+export async function reviewApplication(applicationId: string, status: "Approved" | "Rejected", adminNotes?: string) {
+  try {
+    const res = await axios.patch(`${API_BASE_URL}/car-owner-applications/${applicationId}/review`, {
+      status,
+      adminNodes: adminNotes || "",
+    });
+    return res.data;
+  } catch(err) {
+    console.error("Error reviewing application: ", err);
+    throw new Error("Failed to review application");
+  }
+}
