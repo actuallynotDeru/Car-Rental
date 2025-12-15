@@ -1,24 +1,30 @@
-import { useState, type ReactNode } from "react"
-import { Card } from "@/components/ui/card"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
-import { applicationColumns, type Applycation, type ApplicationTableMeta } from "./application-columns"
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { applicationColumns, type Applycation, type ApplicationTableMeta } from "./application-columns";
+import RenderDialogContent from "./modal-content";
 
 type ApplicationsTableProps = {
-  data: Applycation[]
-  renderDialogContent: (app: Applycation) => ReactNode
-  getStatusColor: ApplicationTableMeta["getStatusColor"]
-  getStatusIcon: ApplicationTableMeta["getStatusIcon"]
-}
+  data: Applycation[];
+  getStatusColor: ApplicationTableMeta["getStatusColor"];
+  getStatusIcon: ApplicationTableMeta["getStatusIcon"];
+  onRefreshData: () => void;
+};
 
-const ApplicationsTable = ({ data, renderDialogContent, getStatusColor, getStatusIcon }: ApplicationsTableProps) => {
-  const [open, setOpen] = useState(false)
-  const [selectedApp, setSelectedApp] = useState<Applycation | null>(null)
+const ApplicationsTable = ({
+  data,
+  getStatusColor,
+  getStatusIcon,
+  onRefreshData,
+}: ApplicationsTableProps) => {
+  const [open, setOpen] = useState(false);
+  const [selectedApp, setSelectedApp] = useState<Applycation | null>(null);
 
   const handleOpenDialog = (app: Applycation) => {
-    setSelectedApp(app)
-    setOpen(true)
-  }
+    setSelectedApp(app);
+    setOpen(true);
+  };
 
   const table = useReactTable<Applycation>({
     data,
@@ -29,14 +35,14 @@ const ApplicationsTable = ({ data, renderDialogContent, getStatusColor, getStatu
       getStatusColor,
       getStatusIcon,
     },
-  })
+  });
 
   return (
     <Dialog
       open={open}
       onOpenChange={(value) => {
-        setOpen(value)
-        if (!value) setSelectedApp(null)
+        setOpen(value);
+        if (!value) setSelectedApp(null);
       }}
     >
       <Card className="overflow-hidden">
@@ -86,11 +92,11 @@ const ApplicationsTable = ({ data, renderDialogContent, getStatusColor, getStatu
 
       {selectedApp && (
         <DialogContent className="min-w-4xl max-h-[90vh] overflow-y-auto">
-          {renderDialogContent(selectedApp)}
+          <RenderDialogContent app={selectedApp} onUpdate={onRefreshData} />
         </DialogContent>
       )}
     </Dialog>
-  )
-}
+  );
+};
 
-export default ApplicationsTable
+export default ApplicationsTable;
