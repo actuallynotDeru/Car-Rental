@@ -1,4 +1,6 @@
 import React from "react";
+import { motion } from "framer-motion";
+import { MainAnimations } from "../animations/main.animations";
 
 interface ReviewCardProps {
   message: string;
@@ -8,7 +10,7 @@ interface ReviewCardProps {
 
 const ReviewCard: React.FC<ReviewCardProps> = ({ message, name, pfp }) => {
     return (
-        <div className="w-[300px] h-[360px] px-7 py-7 flex flex-col bg-white rounded-2xl shadow-lg">
+        <motion.div variants = {MainAnimations.reviewCard} initial = "hidden" whileInView = "visible" whileHover = {MainAnimations.reviewCardHover.hover} className="w-[300px] h-[360px] px-7 py-7 flex flex-col bg-white rounded-2xl shadow-lg">
             <p className="text-[#8D8D8D] mb-6 w-[260px] h-[220px] text-[14px]">
                 {message}
             </p>
@@ -24,7 +26,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ message, name, pfp }) => {
                 )}
                 <span className="text-[#1591EA] font-medium text-[16px]">{name}</span>
             </div>
-        </div>
+        </motion.div>
     );
 };
 

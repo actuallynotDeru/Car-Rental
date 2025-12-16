@@ -10,6 +10,10 @@ import { getStatusColor, getStatusIcon } from "./utils/get"
 import RenderDialogContent from "./components/modal-content"
 import { getApplications } from "./api/application.api"
 import type { Application } from "./types/application.types"
+import { motion } from "framer-motion"
+import { UserApplicationAnimations } from "./animations/admin-user-application.animations"
+
+const MotionCard = motion(Card);
 
 const AdminUserApplicationPage = () => {
   const [searchTerm, setSearchTerm] = useState("")
@@ -77,15 +81,15 @@ const AdminUserApplicationPage = () => {
   }
   
   return(
-    <div className = "flex-1 overflow-auto p-4">
-      <div className = "mb-8">
+    <motion.div variants = {UserApplicationAnimations.container} initial = "hidden" animate = "visible" className = "flex-1 overflow-auto p-4">
+      <motion.div variants = {UserApplicationAnimations.header} initial = "hidden" animate = "visible" className = "mb-8">
         <h1 className = "text-3xl font-bold text-foreground mb-2">Car Owner Applications</h1>
         <p className = "text-muted-foreground">Review and manage car owner applications</p>
-      </div>
+      </motion.div>
 
       {/* metric cards */}
-      <div className = "grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <Card className = "p-6 bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-800">
+      <motion.div variants = {UserApplicationAnimations.metricsGrid} initial = "hidden" animate = "visible" className = "grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <MotionCard variants ={UserApplicationAnimations.metricCard} initial = "hidden" animate = "visible" className = "p-6 bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-800">
           <div className = "flex items-center justify-between">
             <div>
               <p className = "text-sm text-muted-foreground">Pending Reviews</p>
@@ -93,9 +97,9 @@ const AdminUserApplicationPage = () => {
             </div>
             <Clock className = "size-8 text-yellow-600 dark:text-yellow-400"/>
           </div>
-        </Card>
+        </MotionCard>
 
-        <Card className = "p-6 bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800">
+        <MotionCard variants ={UserApplicationAnimations.metricCard} initial = "hidden" animate = "visible" className = "p-6 bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800">
           <div className = "flex items-center justify-between">
             <div>
               <p className = "text-sm text-muted-foreground">Approved</p>
@@ -103,9 +107,9 @@ const AdminUserApplicationPage = () => {
             </div>
             <CheckCircle className = "size-8 text-green-600 dark:text-green-400"/>
           </div>
-        </Card>
+        </MotionCard>
 
-        <Card className = "p-6 bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800">
+        <MotionCard variants ={UserApplicationAnimations.metricCard} initial = "hidden" animate = "visible" className = "p-6 bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800">
           <div className = "flex items-center justify-between">
             <div>
               <p className = "text-sm text-muted-foreground">Rejected</p>
@@ -113,11 +117,11 @@ const AdminUserApplicationPage = () => {
             </div>
             <XCircle className = "size-8 text-red-600 dark:text-red-400"/>
           </div>
-        </Card>
-      </div>
+        </MotionCard>
+      </motion.div>
 
       {/* Filters */}
-      <Card className = "p-6 mb-8">
+      <MotionCard variants = {UserApplicationAnimations.filtersCard} initial = "hidden" animate = "visible" className = "p-6 mb-8">
         <div className = "grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <Label className = "block text-sm font-medium text-foreground mb-2">Search</Label>
@@ -171,7 +175,7 @@ const AdminUserApplicationPage = () => {
             </Button>
           </div>
         </div>
-      </Card>
+      </MotionCard>
 
       {/* Applications Table */}
       <ApplicationsTable
@@ -180,7 +184,7 @@ const AdminUserApplicationPage = () => {
         getStatusColor={getStatusColor}
         getStatusIcon={getStatusIcon}
       />
-    </div>
+    </motion.div>
   )
 }
 

@@ -4,6 +4,8 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { applicationColumns, type Applycation, type ApplicationTableMeta } from "./application-columns";
 import RenderDialogContent from "./modal-content";
+import { motion } from "framer-motion";
+import { UserApplicationAnimations } from "../animations/admin-user-application.animations";
 
 type ApplicationsTableProps = {
   data: Applycation[];
@@ -47,7 +49,7 @@ const ApplicationsTable = ({
     >
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <motion.table variants = {UserApplicationAnimations.table} initial = "hidden" animate = "visible" className="w-full">
             <thead className="bg-muted border-b">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
@@ -86,7 +88,7 @@ const ApplicationsTable = ({
                 </tr>
               )}
             </tbody>
-          </table>
+          </motion.table>
         </div>
       </Card>
 

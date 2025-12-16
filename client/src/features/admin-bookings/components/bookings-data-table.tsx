@@ -22,11 +22,15 @@ import {
   SelectContent,
   SelectItem
 } from "@/components/ui/select";
+import { motion } from "framer-motion";
+import { BookingsAnimations } from "../animations/bookings.animations";
 
 interface BookingsDataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
 }
+
+const MotionTable = motion(Table);
 
 function BookingsDataTable<TData, TValue>({
   columns,
@@ -54,7 +58,7 @@ function BookingsDataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <motion.div variants={BookingsAnimations.header} initial = "hidden" animate = "visible" className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-2">
           <label
             htmlFor="bookings-table-page-size"
@@ -75,52 +79,51 @@ function BookingsDataTable<TData, TValue>({
             </SelectContent>
           </Select>
         </div>
-      </div>
+      </motion.div>
 
       <div className="rounded-md border">
-                <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key = {headerGroup.id}>
-                                {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id}>
-                                        {header.isPlaceholder
-                                          ? null
-                                          : flexRender(
-                                              header.column.columnDef.header,
-                                              header.getContext()
-                                            )}
-                                      </TableHead>
-                                ))}
-
-                            </TableRow>
+        <MotionTable variants={BookingsAnimations.table} initial = "hidden" animate = "visible">
+            <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key = {headerGroup.id}>
+                        {headerGroup.headers.map((header) => (
+                            <TableHead key={header.id}>
+                                {header.isPlaceholder
+                                  ? null
+                                  : flexRender(
+                                      header.column.columnDef.header,
+                                      header.getContext()
+                                    )}
+                              </TableHead>
                         ))}
+                  </TableRow>
+                ))}
 
-                    </TableHeader>
-                    <TableBody>
-                        {table.getRowModel().rows.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow key = {row.id} data-state = {row.getIsSelected() && "selected"}>
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key = {cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </TableCell>
-                                    ))}
-
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan = {columns.length} className = "h-24 text-center">
-                                    No bookings found.
+            </TableHeader>
+            <TableBody>
+                {table.getRowModel().rows.length ? (
+                    table.getRowModel().rows.map((row) => (
+                        <TableRow key = {row.id} data-state = {row.getIsSelected() && "selected"}>
+                            {row.getVisibleCells().map((cell) => (
+                                <TableCell key = {cell.id}>
+                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+                            ))}
 
-      <div className="flex flex-col gap-3 border-t pt-4 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
+                        </TableRow>
+                    ))
+                ) : (
+                    <TableRow>
+                        <TableCell colSpan = {columns.length} className = "h-24 text-center">
+                            No bookings found.
+                        </TableCell>
+                    </TableRow>
+                )}
+            </TableBody>
+        </MotionTable>
+      </div>
+
+      <motion.div variants = {BookingsAnimations.filterCard} initial = "hidden" animate = "visible" className="flex flex-col gap-3 border-t pt-4 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
         <span>
           Showing {from} to {to} of {totalRows} entries
         </span>
@@ -161,7 +164,7 @@ function BookingsDataTable<TData, TValue>({
             Last
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

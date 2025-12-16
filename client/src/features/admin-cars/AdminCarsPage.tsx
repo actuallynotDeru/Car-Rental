@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
-import { Plus, X } from "lucide-react"
+import { X } from "lucide-react"
 import { useState, useMemo, useEffect } from "react"
 import { Label } from "@/components/ui/label"
 import { Carcolumns } from "./components/cars-columns"
@@ -15,6 +15,10 @@ import {
 } from "@/components/ui/select"
 import { getCars } from "./api/car.api"
 import type { Car } from "./types/cars.types"
+import { motion } from "framer-motion"
+import { CarsAnimations } from "./animations/admin-cars.animation"
+
+const MotionCard = motion(Card);
 
 export default function CarsPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -86,19 +90,15 @@ export default function CarsPage() {
   }
   
   return (
-    <div className="flex-1 overflow-auto">
-      <div className="flex items-center justify-between mb-8">
+    <motion.div variants={CarsAnimations.container} initial = "hidden" animate = "visible" className="flex-1 overflow-auto">
+      <motion.div variants={CarsAnimations.header} initial = "hidden" animate = "visible" className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-2">Cars Management</h1>
           <p className="text-muted-foreground">Manage all vehicles in your fleet</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="w-4 h-4" />
-          Add Car
-        </Button>
-      </div>
+      </motion.div>
 
-      <Card className="p-6 mb-6">
+      <MotionCard variants={CarsAnimations.filterCard} initial = "hidden" animate = "visible" className="p-6 mb-6">
         <div className="space-y-3">
           <div className="flex gap-2 flex-wrap items-end">
             <div className="flex-1 min-w-[200px]">
@@ -176,9 +176,9 @@ export default function CarsPage() {
             )}
           </div>
         </div>
-      </Card>
+      </MotionCard>
 
       <CarsDataTable columns={Carcolumns} data={filteredCars} />
-    </div>
+    </motion.div>
   )
 }

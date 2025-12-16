@@ -62,7 +62,7 @@ export const bookingColumns: ColumnDef<BookingTableRow>[] = [
           className={`px-2 py-1 rounded-full text-xs font-medium ${
             isActive
               ? "bg-emerald-100 text-emerald-700"
-              : "bg-amber-100 text-amber-700"
+              : "bg-red-100 text-red-700"
           }`}
         >
           {status}
@@ -144,8 +144,8 @@ export const bookingColumns: ColumnDef<BookingTableRow>[] = [
 
                 <section>
                   <h3 className="text-lg font-semibold text-foreground mb-3">Financials</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-muted p-4 rounded-lg">
+                  <div className="flex gap-4">
+                    <div className="bg-muted p-4 rounded-lg w-full">
                       <p className="text-xs text-muted-foreground mb-1">Total Amount</p>
                       <p className="text-foreground font-semibold">{formattedTotal}</p>
                     </div>
