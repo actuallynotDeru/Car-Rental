@@ -16,6 +16,8 @@ import {
 import { formatDate } from "./utils/format"
 import { getBookings } from "./api/bookings.api"
 import type { Bookings } from "./types/bookings.types"
+import { motion } from "framer-motion"
+import { BookingsAnimations } from "./animations/bookings.animations"
 
 const AdminBookingPage = () => {
     const [searchTerm, setSearchTerm] = useState("")
@@ -98,12 +100,13 @@ const AdminBookingPage = () => {
     
     return(
         <>
-            <div className = "flex-1 overflow-auto">
-                <div className = "mb-8">
-                    <h1 className = "text-3xl font-bold text-foreground mb-2">Bookings Management</h1>
-                    <p className = "text-muted-foreground">View and manage all car rental bookings</p>
-                </div>
-
+          <motion.div variants = {BookingsAnimations.container} initial = "hidden" animate = "visible" className = "flex-1 overflow-auto">
+              <motion.div variants = {BookingsAnimations.header} initial = "hidden" animate = "visible" className = "mb-8">
+                  <h1 className = "text-3xl font-bold text-foreground mb-2">Bookings Management</h1>
+                  <p className = "text-muted-foreground">View and manage all car rental bookings</p>
+              </motion.div>
+                
+              <motion.div variants={BookingsAnimations.filterCard} initial = "hidden" animate = "visible">
                 <Card className = "p-6 mb-6">
                     <div className = "space-y-3">
                         <div className="flex gap-2 flex-wrap items-end">
@@ -141,9 +144,10 @@ const AdminBookingPage = () => {
                         </div>
                     </div>
                 </Card>
-
-                <BookingsDataTable  columns = {bookingColumns} data = {tableData}/>
-            </div>
+              </motion.div>
+                
+              <BookingsDataTable  columns = {bookingColumns} data = {tableData}/>
+            </motion.div>
         </>
     )
 }
