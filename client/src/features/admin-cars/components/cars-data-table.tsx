@@ -22,11 +22,15 @@ import {
   SelectContent,
   SelectItem
 } from "@/components/ui/select"
+import { motion } from "framer-motion"
+import { CarsAnimations } from "../animations/admin-cars.animation"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
 }
+
+const MotionTable = motion(Table);
 
 export function CarsDataTable<TData, TValue>({
   columns,
@@ -55,7 +59,7 @@ export function CarsDataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <motion.div variants={CarsAnimations.filterCard} initial = "hidden" animate = "visible" className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-2">
           <label
             htmlFor="cars-table-page-size"
@@ -76,10 +80,10 @@ export function CarsDataTable<TData, TValue>({
             </SelectContent>
           </Select>
         </div>
-      </div>
+      </motion.div>
 
       <div className="rounded-md border">
-        <Table>
+        <MotionTable variants={CarsAnimations.table} initial = "hidden" animate = "visible">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -121,10 +125,10 @@ export function CarsDataTable<TData, TValue>({
               </TableRow>
             )}
           </TableBody>
-        </Table>
+        </MotionTable>
       </div>
 
-      <div className="flex flex-col gap-3 border-t pt-4 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
+      <motion.div variants = {CarsAnimations.filterCard} initial = "hidden" animate = "visible" className="flex flex-col gap-3 border-t pt-4 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
         <span>
           Showing {from} to {to} of {totalRows} entries
         </span>
@@ -165,7 +169,7 @@ export function CarsDataTable<TData, TValue>({
             Last
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

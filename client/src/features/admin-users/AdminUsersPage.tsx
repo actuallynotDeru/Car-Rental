@@ -9,6 +9,10 @@ import { UsersDataTable } from "./components/users-data-table";
 import { userColumns } from "./components/users-columns";
 import { getUsers } from "./api/user.api";
 import type { User } from "@/types";
+import { motion } from "framer-motion";
+import { UsersAnimations } from "./animations/admin-users.animations";
+
+const MotionCard = motion(Card);
 
 const AdminUsers = () => {
     const [searchTerm, setSearchTerm] = useState("")
@@ -83,77 +87,77 @@ const AdminUsers = () => {
     }
 
     return(
-        <div className = "flex-1 overflow-auto">
-            <div className = "mb-8">
-                <h1 className = "text-3xl font-bold text-foreground mb-2">Users Management</h1>
-                <p className = "text-muted-foreground">Manage all users and their roles</p>
-            </div>
+        <motion.div variants={UsersAnimations.container} initial = "hidden" animate = "visible" className = "flex-1 overflow-auto">
+          <motion.div variants={UsersAnimations.header} initial = "hidden" animate = "visible"  className = "mb-8">
+              <h1 className = "text-3xl font-bold text-foreground mb-2">Users Management</h1>
+              <p className = "text-muted-foreground">Manage all users and their roles</p>
+          </motion.div>
 
-            <Card className = "p-6 mb-6">
-                <div className = "space-y-3">
-                    <div className = "flex gap-2 flex-wrap items-end">
-                        <div className = "flex-1 min-w-[200px]">
-                            <Label className = "text-sm font-medium text-foreground mb-1 block">Search</Label>
-                            <Input 
-                                placeholder = "Search users..."
-                                value = {searchTerm}
-                                onChange = {(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
+          <MotionCard variants = {UsersAnimations.filterCard} initial = "hidden" animate = "visible" className = "p-6 mb-6">
+              <div className = "space-y-3">
+                  <div className = "flex gap-2 flex-wrap items-end">
+                      <div className = "flex-1 min-w-[200px]">
+                          <Label className = "text-sm font-medium text-foreground mb-1 block">Search</Label>
+                          <Input 
+                              placeholder = "Search users..."
+                              value = {searchTerm}
+                              onChange = {(e) => setSearchTerm(e.target.value)}
+                          />
+                      </div>
 
-                        <div className = "min-w-[150px]">
-                            <Label className = "text-sm font-medium text-foreground mb-1 block">Role</Label>
-                            <Select
-                            value={filters.role}
-                            onValueChange={(e) => handleFilterChange("role", e)}
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="All" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value = "all">All</SelectItem>
-                                    <SelectItem value="Admin">Admin</SelectItem>
-                                    <SelectItem value="Customer">Customer</SelectItem>
-                                    <SelectItem value="CarOwner">Car Owner</SelectItem>
-                                    <SelectItem value="Registrar">Registrar</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
+                      <div className = "min-w-[150px]">
+                          <Label className = "text-sm font-medium text-foreground mb-1 block">Role</Label>
+                          <Select
+                          value={filters.role}
+                          onValueChange={(e) => handleFilterChange("role", e)}
+                          >
+                              <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="All" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                  <SelectItem value = "all">All</SelectItem>
+                                  <SelectItem value="Admin">Admin</SelectItem>
+                                  <SelectItem value="Customer">Customer</SelectItem>
+                                  <SelectItem value="CarOwner">Car Owner</SelectItem>
+                                  <SelectItem value="Registrar">Registrar</SelectItem>
+                              </SelectContent>
+                          </Select>
+                      </div>
 
-                        <div className = "min-w-[150px]">
-                            <Label className = "text-sm font-medium text-foreground mb-1 block">Status</Label>
-                            <Select
-                                value = {filters.status}
-                                onValueChange = {(e) => handleFilterChange("status", e)}
-                            >
-                                <SelectTrigger className = "w-full">
-                                    <SelectValue placeholder = "All"/>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value = "all">All</SelectItem>
-                                    <SelectItem value = "Verified">Verified</SelectItem>
-                                    <SelectItem value = "Unverified">Unverified</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
+                      <div className = "min-w-[150px]">
+                          <Label className = "text-sm font-medium text-foreground mb-1 block">Status</Label>
+                          <Select
+                              value = {filters.status}
+                              onValueChange = {(e) => handleFilterChange("status", e)}
+                          >
+                              <SelectTrigger className = "w-full">
+                                  <SelectValue placeholder = "All"/>
+                              </SelectTrigger>
+                              <SelectContent>
+                                  <SelectItem value = "all">All</SelectItem>
+                                  <SelectItem value = "Verified">Verified</SelectItem>
+                                  <SelectItem value = "Unverified">Unverified</SelectItem>
+                              </SelectContent>
+                          </Select>
+                      </div>
 
-                        {hasActiveFilters && (
-                            <Button
-                                variant = "outline"
-                                size = "sm"
-                                onClick = {clearFilters}
-                                className = "gap-2 bg-transparent"
-                            >
-                                <X className = "size-4" />
-                                Clear Filters
-                            </Button>
-                        )}
-                    </div>
-                </div>
-            </Card>
+                      {hasActiveFilters && (
+                          <Button
+                              variant = "outline"
+                              size = "sm"
+                              onClick = {clearFilters}
+                              className = "gap-2 bg-transparent"
+                          >
+                              <X className = "size-4" />
+                              Clear Filters
+                          </Button>
+                      )}
+                  </div>
+              </div>
+          </MotionCard>
 
-            <UsersDataTable columns = {userColumns} data = {filteredUsers} />
-        </div>
+          <UsersDataTable columns = {userColumns} data = {filteredUsers} />
+        </motion.div>
     )
 }
 

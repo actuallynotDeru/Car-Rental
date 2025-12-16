@@ -123,7 +123,7 @@ function BookingsDataTable<TData, TValue>({
         </MotionTable>
       </div>
 
-      <div className="flex flex-col gap-3 border-t pt-4 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
+      <motion.div variants = {BookingsAnimations.filterCard} initial = "hidden" animate = "visible" className="flex flex-col gap-3 border-t pt-4 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
         <span>
           Showing {from} to {to} of {totalRows} entries
         </span>
@@ -164,7 +164,7 @@ function BookingsDataTable<TData, TValue>({
             Last
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

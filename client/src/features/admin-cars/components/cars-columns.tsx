@@ -39,7 +39,7 @@ export const Carcolumns: ColumnDef<Car>[] = [
     header: "Price/Day",
     cell: ({ row }) => {
       const car = row.original
-      const formattedPrice = `$${Number(car.price).toLocaleString()}`
+      const formattedPrice = `₱${Number(car.price).toLocaleString()}`
       const statusClasses =
         car.status === "Available"
           ? "bg-emerald-100 text-emerald-700"

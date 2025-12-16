@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react"
 import MetricGrid, { type Metric } from "@/components/admin/ui/MetricGrid"
 import { Card } from "@/components/ui/card"
-import { mockBookings, mockCars } from "@/lib/mock-data"
 import { Users, CarIcon, BriefcaseBusiness, DollarSign } from "lucide-react"
 import type { User, Car, Bookings } from "./types/dashboard.types"
 import { getUsers } from "../admin-users/api/user.api"
 import { getCars } from "../admin-cars/api/car.api"
 import { getBookings } from "../admin-bookings/api/bookings.api"
+import { motion } from "framer-motion"
+import { DashboardAnimations } from "./animations/admin-dashboard.animations"
+
+const MotionCard = motion(Card);
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState<User[]>([])
@@ -68,56 +71,57 @@ const AdminDashboard = () => {
   ]
 
   return(
-      <>
-          <div className = "flex-1 overflow-auto px-8 space-y-4">
-              <h1 className = "text-3xl font-bold text-foreground mb-2">Dashboard</h1>
-              <p className = "text-muted-foreground">Business Overview</p>
+    <>
+      <motion.div variants = {DashboardAnimations.container} initial = "hidden" animate = "visible" className = "flex-1 overflow-auto px-8 space-y-4">
+        <motion.div variants={DashboardAnimations.title} initial = "hidden" animate = "visible">
+          <h1 className = "text-3xl font-bold text-foreground mb-2">Dashboard</h1>
+          <p className = "text-muted-foreground">Business Overview</p>
+        </motion.div>
 
-              <div className = "mb-8">
-                  <MetricGrid 
-                      metrics = {metrics}
-                      className= "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-                  />
-              </div>
+        <motion.div variants={DashboardAnimations.metricCard} initial = "hidden" animate = "visible" className = "mb-8">
+              <MetricGrid 
+                  metrics = {metrics}
+                  className= "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+              />
+          </motion.div>
 
-              <div className = "grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <Card className = "p-6">
-                      <h3 className = "text-lg font-semibold text-foreground mb-4">Recent Bookings</h3>
-                      <div className = "space-y-3">
-                          {bookings.slice(0, 3).map((booking) => (
-                              <div key = {booking.id} className = "flex items-center justify-between p-3 bg-muted rounded-lg">
-                                  <div>
-                                      <p className = "font-medium text-foreground">Booking #{booking.id}</p>
-                                      <p className = "text-sm text-muted-foreground">{booking.status}</p>
-                                  </div>
-                                  <p className = "font-semibold text-foreground">${booking.totalPrice}</p>
+          <div className = "grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <MotionCard variants={DashboardAnimations.dataCard} initial = "hidden" animate = "visible" className = "p-6">
+                  <h3 className = "text-lg font-semibold text-foreground mb-4">Recent Bookings</h3>
+                  <div className = "space-y-3">
+                      {bookings.slice(0, 3).map((booking) => (
+                          <motion.div variants={DashboardAnimations.listItem} initial = "hidden" animate = "visible" key = {booking.id} className = "flex items-center justify-between p-3 bg-muted rounded-lg">
+                              <div>
+                                  <p className = "font-medium text-foreground">Booking #{booking.id}</p>
+                                  <p className = "text-sm text-muted-foreground">{booking.status}</p>
                               </div>
-                          ))}
-                      </div>
-                  </Card>
+                              <p className = "font-semibold text-foreground">${booking.totalPrice}</p>
+                          </motion.div>
+                      ))}
+                  </div>
+              </MotionCard>
 
-                  <Card className = "p-6">
-                      <h3 className = "text-lg font-semibold text-foreground mb-4">Available Cars</h3>
-                      <div className = "space-y-3">
-                          {cars
-                              .filter((car) => car.status === 'Available')
-                              .slice(0, 3)
-                              .map((car) => (
-                                  <div key = {car.id} className = "flex items-center justify-between p-3 bg-muted rounded-lg">
-                                      <div>
-                                          <p className = "font-medium text-foreground">{car.name}</p>
-                                          <p className = "text-sm text-muted-foreground">{car.rating}</p>
-                                      </div>
-                                      <p className = "font-semibold text-foreground">₱{car.price}/day</p>
+              <MotionCard variants={DashboardAnimations.dataCard} initial = "hidden" animate = "visible" className = "p-6">
+                  <h3 className = "text-lg font-semibold text-foreground mb-4">Available Cars</h3>
+                  <div className = "space-y-3">
+                      {cars
+                          .filter((car) => car.status === 'Available')
+                          .slice(0, 3)
+                          .map((car) => (
+                            <motion.div variants={DashboardAnimations.listItem} initial = "hidden" animate = "visible" key = {car.id} className = "flex items-center justify-between p-3 bg-muted rounded-lg">
+                                  <div>
+                                      <p className = "font-medium text-foreground">{car.name}</p>
+                                      <p className = "text-sm text-muted-foreground">{car.rating}</p>
                                   </div>
-                              ))
-                          }
-                      </div>
-                  </Card>
-              </div>
+                                  <p className = "font-semibold text-foreground">₱{car.price}/day</p>
+                              </motion.div>
+                          ))
+                      }
+                  </div>
+              </MotionCard>
           </div>
-      </>
-
+      </motion.div>
+    </>
   )
 }
 
