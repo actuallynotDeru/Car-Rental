@@ -24,9 +24,6 @@ const CustomizeProfile = () => {
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  /* ================================
-      Fetch Profile
-  ================================= */
   useEffect(() => {
     const fetchProfile = async () => {
       if (!userId) return;
@@ -45,9 +42,6 @@ const CustomizeProfile = () => {
     fetchProfile();
   }, [userId]);
 
-  /* ================================
-      Image Preview
-  ================================= */
   useEffect(() => {
     if (!selectedFile) {
       setPreviewUrl(null);
@@ -60,9 +54,6 @@ const CustomizeProfile = () => {
     return () => URL.revokeObjectURL(url);
   }, [selectedFile]);
 
-  /* ================================
-      Handlers
-  ================================= */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -114,9 +105,6 @@ const CustomizeProfile = () => {
     }
   };
 
-  /* ================================
-      Loading State
-  ================================= */
   if (loading) {
     return (
       <div className="p-16 space-y-6">
@@ -133,9 +121,6 @@ const CustomizeProfile = () => {
 
   const imageSrc = previewUrl || profile.selfiePhoto || "";
 
-  /* ================================
-      Render
-  ================================= */
   return (
     <div className="p-16">
       <Button
