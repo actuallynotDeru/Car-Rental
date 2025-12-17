@@ -5,33 +5,35 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { User, Mail, Phone, MapPin, Calendar, Shield, ArrowLeft, Info} from "lucide-react";
+import { User, ArrowLeft, Camera } from "lucide-react";
 import { ProfileAPI } from "./api/profile.api";
 import type { UserProfile } from "./types/profile.types";
+import { SERVER_BASE_URL } from "@/config/serverURL";
 
 const CustomizeProfile = () => {
   const { userId } = useParams<{ userId: string }>();
+  const navigate = useNavigate();
+
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [formData, setFormData] = useState<Partial<UserProfile>>({});
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!userId) {
-        setError("User ID is required");
-        setLoading(false);
-        return;
-      }
-
+      if (!userId) return;
       try {
         setLoading(true);
         const data = await ProfileAPI.getUserById(userId);
         setProfile(data);
-        setError(null);
+        setFormData(data); // source of truth
       } catch (err: any) {
-        setError(err.response?.data?.message || "Failed to fetch user profile");
+        setError(err.response?.data?.message || "Failed to fetch profile");
       } finally {
         setLoading(false);
       }
@@ -40,15 +42,66 @@ const CustomizeProfile = () => {
     fetchProfile();
   }, [userId]);
 
-  const handleUpdate = async (updatedData: Partial<UserProfile>) => {
-    if (!userId) return;
+  useEffect(() => {
+    if (!selectedFile) {
+      setPreviewUrl(null);
+      return;
+    }
+
+    const url = URL.createObjectURL(selectedFile);
+    setPreviewUrl(url);
+
+    return () => URL.revokeObjectURL(url);
+  }, [selectedFile]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const handleCancel = () => {
+    if (!profile) return;
+    setFormData(profile);
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setIsEditing(false);
+    setError(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isEditing || !userId) return;
 
     try {
-      const updated = await ProfileAPI.updateUser(userId, updatedData);
+      setSaving(true);
+      setError(null);
+
+      const data = new FormData();
+      data.append("fullName", formData.fullName ?? "");
+      data.append("phone", formData.phone ?? "");
+      data.append("city", formData.city ?? "");
+      data.append("zip", formData.zip ?? "");
+
+      if (selectedFile) {
+        data.append("selfiePhoto", selectedFile);
+      }
+
+      const updated = await ProfileAPI.updateUser(userId, data);
       setProfile(updated);
+      setFormData(updated);
       setIsEditing(false);
+      setSelectedFile(null);
+      setPreviewUrl(null);
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to update profile");
+      setError(err.response?.data?.message || "Update failed");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -59,17 +112,6 @@ const CustomizeProfile = () => {
         <Card className="p-6 space-y-4">
           <Skeleton className="h-8 w-full" />
           <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-8 w-full" />
-        </Card>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-16">
-        <Card className="p-12 text-center">
-          <p className="text-destructive">{error}</p>
         </Card>
       </div>
     );
@@ -77,147 +119,163 @@ const CustomizeProfile = () => {
 
   if (!profile) return null;
 
+  const imageSrc = previewUrl || profile.selfiePhoto || "";
+
   return (
     <div className="p-16">
       <Button
         variant="ghost"
         onClick={() => navigate("/")}
-        className="mb-4 gap-2 hover:cursor-pointer"
+        className="mb-4 gap-2"
       >
         <ArrowLeft className="w-4 h-4" />
         Back
       </Button>
-      
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">User Profile</h1>
-        <p className="">View and manage user information</p>
-      </div>
 
-      <Card className="p-6">
-        <div className="space-y-6">
-          {/* Personal Information */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <User className="size-5" />
-              Personal Information
-            </h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <Label className = "text-lg font-semibold">Full Name</Label>
-                <div className="flex items-center gap-2 mt-1">
-                  <User className="size-4" />
-                  <p className="text-foreground">{profile.fullName}</p>
-                </div>
+      <h1 className="text-3xl font-bold mb-8">Edit Account</h1>
+
+      {isEditing ? (
+        // EDIT MODE
+        <form onSubmit={handleSubmit} encType="multipart/form-data">
+          <Card className="p-6 space-y-8 ring-2 ring-primary">
+            {/* Profile Photo */}
+            <div className="flex flex-col items-center gap-4 border-b pb-6">
+              <div className="relative size-32 rounded-full border bg-muted overflow-hidden flex items-center justify-center">
+                {imageSrc ? (
+                  <img src={imageSrc} className="size-full object-cover" />
+                ) : (
+                  <User className="size-12 text-muted-foreground" />
+                )}
+
+                <label className="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer">
+                  <Camera className="text-white" />
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                </label>
               </div>
 
-              <div>
-                <Label className = "text-lg font-semibold">Email</Label>
-                <div className="flex items-center gap-2 mt-1">
-                  <Mail className="size-4 " />
-                  <p className="text-foreground">{profile.email}</p>
-                </div>
-              </div>
-
-              <div>
-                <Label className = "text-lg font-semibold">Phone Number</Label>
-                <div className="flex items-center gap-2 mt-1">
-                  <Phone className="size-4 " />
-                  <p className="text-foreground">{profile.phone}</p>
-                </div>
-              </div>
-
-              <div>
-                <Label className = "text-lg font-semibold">Role</Label>
-                <div className="flex items-center gap-2 mt-1">
-                  <Shield className="size-4 " />
-                  <p className="text-foreground capitalize">{profile.role}</p>
-                </div>
-              </div>
-
-              {profile.dateOfBirth && (
-                <div>
-                  <Label className = "text-lg font-semibold">Date of Birth</Label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Calendar className="size-4 " />
-                    <p className="text-foreground">
-                      {new Date(profile.dateOfBirth).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
+              {selectedFile && (
+                <p className="text-sm text-blue-500">
+                  New photo selected: {selectedFile.name}
+                </p>
               )}
             </div>
-          </div>
 
-          {/* Address Information */}
-          {(profile.fullAddress || profile.city || profile.province || profile.zip) && (
-            <div className="border-t pt-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <MapPin className="size-5" />
-                Address Information
-              </h2>
-              <div className="grid md:grid-cols-2 gap-4">
-                {profile.fullAddress && (
-                  <div>
-                    <Label className = "text-lg font-semibold">Address</Label>
-                    <p className="text-foreground mt-1">{profile.fullAddress}</p>
-                  </div>
-                )}
+            {/* Error */}
+            {error && (
+              <p className="text-sm text-red-500 text-center">{error}</p>
+            )}
 
-                {profile.city && (
-                  <div>
-                    <Label className = "text-lg font-semibold">City</Label>
-                    <p className="text-foreground mt-1">{profile.city}</p>
-                  </div>
-                )}
+            {/* Form Fields */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label>Full Name</Label>
+                <Input
+                  name="fullName"
+                  value={formData.fullName ?? ""}
+                  onChange={handleInputChange}
+                />
+              </div>
 
-                {profile.province && (
-                  <div>
-                    <Label className = "text-lg font-semibold">State</Label>
-                    <p className="text-foreground mt-1">{profile.province}</p>
-                  </div>
-                )}
+              <div className="space-y-2">
+                <Label>Phone Number</Label>
+                <Input
+                  name="phone"
+                  value={formData.phone ?? ""}
+                  onChange={handleInputChange}
+                />
+              </div>
 
-                {profile.zip && (
-                  <div>
-                    <Label className = "text-lg font-semibold">Zip Code</Label>
-                    <p className="text-foreground mt-1">{profile.zip}</p>
-                  </div>
-                )}
+              <div className="space-y-2">
+                <Label>City</Label>
+                <Input
+                  name="city"
+                  value={formData.city ?? ""}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Zip Code</Label>
+                <Input
+                  name="zip"
+                  value={formData.zip ?? ""}
+                  onChange={handleInputChange}
+                />
               </div>
             </div>
+
+            {/* Save/Cancel Buttons */}
+            <div className="flex gap-4 pt-4">
+              <Button type="submit" disabled={saving}>
+                {saving ? "Saving..." : "Save Changes"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCancel}
+              >
+                Cancel
+              </Button>
+            </div>
+          </Card>
+        </form>
+      ) : (
+        // VIEW MODE
+        <>
+          {/* Error Display in View Mode */}
+          {error && (
+            <p className="text-sm text-red-500 mb-4 text-center">{error}</p>
           )}
 
-          {/* Account Information */}
-          <div className="border-t pt-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <Info className="size-5" />
-              Account Information
-            </h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <Label className = "text-lg font-semibold">Account Created</Label>
-                <p className="text-foreground mt-1">
-                  {new Date(profile.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-
-              <div>
-                <Label className = "text-lg font-semibold">Last Updated</Label>
-                <p className="text-foreground mt-1">
-                  {new Date(profile.updatedAt).toLocaleDateString()}
-                </p>
+          <Card className="p-6 space-y-8">
+            {/* Profile Photo */}
+            <div className="flex flex-col items-center gap-4 border-b pb-6">
+              <div className="relative size-32 rounded-full border bg-muted overflow-hidden flex items-center justify-center">
+                {profile.selfiePhoto ? (
+                  <img src={`${SERVER_BASE_URL}${profile.selfiePhoto}`} className="size-full object-cover" />
+                ) : (
+                  <User className="size-12 text-muted-foreground" />
+                )}
               </div>
             </div>
-          </div>
 
-          {/* Actions */}
-          <div className="border-t pt-6 flex gap-2">
-            <Button onClick={() => setIsEditing(!isEditing)}>
-              {isEditing ? "Cancel" : "Edit Profile"}
-            </Button>
-          </div>
-        </div>
-      </Card>
+            {/* Profile Details */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label className="text-muted-foreground">Full Name</Label>
+                <div className="text-lg font-medium">{profile.fullName || "Not provided"}</div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-muted-foreground">Phone Number</Label>
+                <div className="text-lg font-medium">{profile.phone || "Not provided"}</div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-muted-foreground">City</Label>
+                <div className="text-lg font-medium">{profile.city || "Not provided"}</div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-muted-foreground">Zip Code</Label>
+                <div className="text-lg font-medium">{profile.zip || "Not provided"}</div>
+              </div>
+            </div>
+
+            {/* Edit Button */}
+            <div className="pt-4">
+              <Button onClick={() => setIsEditing(true)}>
+                Edit Profile
+              </Button>
+            </div>
+          </Card>
+        </>
+      )}
     </div>
   );
 };
