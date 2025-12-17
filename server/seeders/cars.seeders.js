@@ -25,6 +25,8 @@ function makeCar(owner, plate) {
     rating: Number((Math.random() * 1.5 + 3.5).toFixed(1)),
     image: faker.image.url(),
     status: pick(["Available", "Unavailable"]),
+    description: faker.lorem.sentence({ min: 10, max: 20 }),
+    location: `${faker.location.city()}, ${faker.location.state()}`,
   };
 }
 

@@ -62,6 +62,14 @@ const carsSchema = new mongoose.Schema({
         enum: ["Available", "Unavailable"],
         default: "Available"
     },
+    
+    description: {
+      type: String,
+    },
+    
+    location: {
+      type: String,
+    }
 
 }, {timestamps: true})
 
