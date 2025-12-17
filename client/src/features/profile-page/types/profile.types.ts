@@ -11,7 +11,8 @@ export interface UserProfile {
   province?: string
   city?: string;
   country?: string;
-  zip?: number;
+  zip?: string;
   createdAt: string;
   updatedAt: string;
+  selfiePhoto: File
 }

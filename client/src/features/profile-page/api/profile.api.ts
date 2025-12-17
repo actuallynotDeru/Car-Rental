@@ -8,7 +8,7 @@ export const ProfileAPI = {
     return res.data;
   },
   
-  updateUser: async (userId: string, userData: Partial<UserProfile>): Promise<UserProfile> => {
+  updateUser: async(userId: string, userData: FormData | Partial<UserProfile>): Promise<UserProfile> => {
     const res = await axios.put(`${API_BASE_URL}/users/${userId}`, userData);
     return res.data;
   },
