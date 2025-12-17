@@ -12,12 +12,18 @@ import EditModal from "./components/edit-modal"
 import { FleetAPI } from "./api/fleet.api"
 import type { Car as CarType } from "./types/fleet.types"
 
+interface UserData {
+  _id: string
+  role: string
+}
+
 export default function FleetPage() {
   // Mock current car owner - Replace with actual auth
   const { userId } = useParams<{ userId: string }>();
   const currentOwnerId = userId // Replace with actual user ID from auth
   const navigate = useNavigate()
 
+  const [user, setUser] = useState<UserData | null>(null)
   const [ownerCars, setOwnerCars] = useState<CarType[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -37,6 +43,26 @@ export default function FleetPage() {
     plateNumber: "",
     image: "",
     status: "Available",
+  })
+  
+  useEffect(() => {
+    const userStr = localStorage.getItem('user')
+    if(userStr) {
+      try {
+        const userData = JSON.parse(userStr)
+        setUser(userData)
+      } catch(err) {
+        console.error("Error parsing user data: ", err);
+      }
+    }
+  }, [])
+  
+  useEffect(() => {
+    if (!user) return;
+    
+    if(user.role !== "CarOwner") {
+      navigate("/");
+    }
   })
 
   // Fetch cars on mount
