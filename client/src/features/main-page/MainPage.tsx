@@ -1,12 +1,95 @@
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import carImg from "../../assets/carimg.jpg"
 import vector_img1 from "../../assets/vector_img1.svg"
 import vector_img2 from "../../assets/vector_img2.svg"
 import ReviewCard from "./components/ReviewCard.tsx"
-import { Calendar, Search, CircleCheckBig, Key } from "lucide-react"
+import { Calendar, Search, CircleCheckBig, Key, Sun, User } from "lucide-react"
 import { motion } from "framer-motion"
 import { MainAnimations } from "./animations/main.animations.ts"
 
+interface UserData {
+  _id: string
+  fullName: string
+  email: string
+  role: string
+  status: string
+}
+
 const MainPage = () => {
+    const navigate = useNavigate()
+    const [user, setUser] = useState<UserData | null>(null)
+
+    useEffect(() => {
+        // Get user data from localStorage
+        const userStr = localStorage.getItem('user')
+        if (userStr) {
+            try {
+                const userData = JSON.parse(userStr)
+                setUser(userData)
+            } catch (error) {
+                console.error('Error parsing user data:', error)
+            }
+        }
+    }, [])
+
+    const handleLogout = () => {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        setUser(null)
+        navigate('/')
+    }
+
+    const getRoleBasedButtons = () => {
+        if (!user) {
+            return (
+                <>
+                    <a href="/signup" className="hover:underline">Sign Up</a>
+                    <a href="/login" className="hover:underline">Log In</a>
+                </>
+            )
+        }
+
+        const commonButtons = (
+            <>
+                <a href="/account" className="hover:underline">Profile</a>
+                <a href={`/Customize_account/${user._id}`} className="hover:underline">Settings</a>
+                <button onClick={handleLogout} className="hover:underline">Log Out</button>
+            </>
+        )
+
+        if (user.role === 'CarOwner') {
+            return (
+                <>
+                    <a href={`/fleet/${user._id}`} className="hover:underline">My Fleet</a>
+                    <a href={`/booking/review/${user._id}`} className="hover:underline">Booking Requests</a>
+                    {commonButtons}
+                </>
+            )
+        }
+
+        if (user.role === 'Customer') {
+            return (
+                <>
+                    <a href="/rental" className="hover:underline">Rent a Car</a>
+                    <a href="/application/form" className="hover:underline">Become a Car Owner</a>
+                    {commonButtons}
+                </>
+            )
+        }
+
+        if (user.role === 'Admin') {
+            return (
+                <>
+                    <a href="/admin" className="hover:underline">Dashboard</a>
+                    {commonButtons}
+                </>
+            )
+        }
+
+        return commonButtons
+    }
+
     return(
       <>
         <motion.div variants = {MainAnimations.hero} initial = "hidden" whileInView = "visible">
@@ -23,16 +106,15 @@ const MainPage = () => {
               <div className="px-8">
                   <p className="text-2xl font-semibold">LOGO HERE</p>
               </div>
-  
-              <div className="px-8 space-x-8 flex self-center">
-                  <a href="/rental">Rent</a>
-                  <a href="">About</a>
-                  <a href="">List Your Car</a>
-              </div>
-  
-              <div className="px-8 space-x-8 flex self-center">
-                  <a href="/signup">Sign Up</a>
-                  <a href="/login">Log In</a>
+
+              <div className="px-8 space-x-6 flex self-center items-center">
+                  {user && (
+                      <div className="flex items-center gap-2">
+                          <User size={18} />
+                          <span className="text-sm">{user.fullName}</span>
+                      </div>
+                  )}
+                  {getRoleBasedButtons()}
               </div>
           </motion.div>
   
@@ -106,30 +188,32 @@ const MainPage = () => {
           <motion.div variants={MainAnimations.featureText} initial = "hidden" whileInView = "visible" className="flex flex-col justify-center px-10">
               <div className="flex flex-col h-auto w-[400px] justify-center gap-3">
                   <h1 className="font-semibold text-3xl">Explore Cebu <span className="text-[#1591EA]">Your Way</span></h1>
-                  <p className="text-lg">Discover freedom on Cebu’s road with Eehway’s diverse 
-                      car selection. Whether it’s a weekend escape or a 
-                      daily drive, we’ve got the ride for you.</p>
+                  <p className="text-lg">Discover freedom on Cebu's road with Eehway's diverse 
+                      car selection. Whether it's a weekend escape or a 
+                      daily drive, we've got the ride for you.</p>
               </div>
-              <button className="bg-[#1591EA] mt-5 text-white h-[35px] w-[100px] flex items-center justify-center gap-5
-              rounded-[8px]">
+              <button 
+                onClick={() => navigate('/rental')}
+                className="bg-[#1591EA] mt-5 text-white h-[35px] w-[100px] flex items-center justify-center gap-5 rounded-[8px] hover:bg-[#1280D1] transition-colors">
                   Search Car
               </button>
           </motion.div>
       </motion.div>
-      {/* Share the Drive */}
       
+      {/* Share the Drive */}
       <div className="w-auto h-[500px] pt-5 bg-[#F2F2F2] flex justify-center">
 
           {/* text */} 
           <motion.div variants={MainAnimations.featureText} initial = "hidden" whileInView = "visible" className="flex flex-col justify-center px-10">
               <div className="flex flex-col h-auto w-[400px] justify-center gap-3">
                   <h1 className="font-semibold text-3xl"><span className="text-[#1591EA]">Share </span>The Drive</h1>
-                  <p className="text-lg">Discover freedom on Cebu’s road with Eehway’s diverse 
-                      car selection. Whether it’s a weekend escape or a 
-                      daily drive, we’ve got the ride for you.</p>
+                  <p className="text-lg">Discover freedom on Cebu's road with Eehway's diverse 
+                      car selection. Whether it's a weekend escape or a 
+                      daily drive, we've got the ride for you.</p>
               </div>
-              <button className="bg-[#1591EA] mt-5 text-white h-[35px] w-[120px] flex items-center justify-center gap-5
-              rounded-[8px]">
+              <button 
+                onClick={() => navigate('/application/form')}
+                className="bg-[#1591EA] mt-5 text-white h-[35px] w-[120px] flex items-center justify-center gap-5 rounded-[8px] hover:bg-[#1280D1] transition-colors">
                   List Your Car
               </button>
           </motion.div>
@@ -149,7 +233,7 @@ const MainPage = () => {
               </h2>
               <p className="w-[620px] text-[#8D8D8D]">
               At Eehway Transport, we make car rental simple, affordable, and reliable.
-              Whether you’re traveling for business or leisure, our well-maintained
+              Whether you're traveling for business or leisure, our well-maintained
               vehicles and smooth booking process ensure a hassle-free experience
               every time.
               </p>
@@ -178,14 +262,10 @@ const MainPage = () => {
       </motion.div>
 
       <motion.div variants = {MainAnimations.footer} initial = "hidden" whileInView = "visible" className="w-auto h-[100px] bg-[#1591EA]">
-          <p className="text-center text-white">Footer</p>
+
       </motion.div>
-
-
       </>
     )
 }
 
-
-
-export default MainPage;
+export default MainPage
