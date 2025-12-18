@@ -1,30 +1,37 @@
 import { Star, Users, Settings, Fuel, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useNavigate } from "react-router-dom"
+import type { Car } from "../types/product.types" // Adjust path to where your types are defined
 
 interface RentalCardProps {
-  imgSrc: string
-  imgAlt?: string
-  carName: string
-  rating: number
-  price: number
-  seats: number
-  transmission: string
-  type: string
+  car: Car
 }
 
-const RentalCard = ({ imgSrc, imgAlt, carName, rating, price, seats, transmission, type }: RentalCardProps) => {
+const RentalCard = ({ car }: RentalCardProps) => {
+  const navigate = useNavigate()
+
+  // Destructure the car object for easier access
+  const { 
+    _id, 
+    name, 
+    image, 
+    rating, 
+    price, 
+    carDetails 
+  } = car
+
   return (
     <div className="group relative bg-card rounded-2xl overflow-hidden border border-border hover:border-foreground/20 transition-all duration-300 hover:shadow-lg">
       {/* Image Container */}
       <div className="relative h-48 bg-muted overflow-hidden">
         <img
-          src={imgSrc || "/placeholder.svg"}
-          alt={imgAlt || carName}
+          src={image || "/placeholder.svg"}
+          alt={name}
           className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
         />
-        {/* Badge */}
+        {/* Badge - Using Fuel Type as the badge */}
         <div className="absolute top-4 left-4 bg-blue-400 text-background text-xs font-medium px-3 py-1 rounded-full">
-          {type}
+          {carDetails.fuelType}
         </div>
       </div>
 
@@ -33,7 +40,7 @@ const RentalCard = ({ imgSrc, imgAlt, carName, rating, price, seats, transmissio
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h3 className="text-lg font-semibold text-foreground leading-tight">{carName}</h3>
+            <h3 className="text-lg font-semibold text-foreground leading-tight">{name}</h3>
             <div className="flex items-center gap-1.5 mt-1">
               <Star size={14} className="text-foreground fill-foreground" />
               <span className="text-sm font-medium text-foreground">{rating}</span>
@@ -46,15 +53,15 @@ const RentalCard = ({ imgSrc, imgAlt, carName, rating, price, seats, transmissio
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-1.5">
             <Users size={16} />
-            <span>{seats}</span>
+            <span>{carDetails.seats}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Settings size={16} />
-            <span>{transmission}</span>
+            <span>{carDetails.transmission}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Fuel size={16} />
-            <span>{type}</span>
+            <span>{carDetails.fuelType}</span>
           </div>
         </div>
 
@@ -67,7 +74,10 @@ const RentalCard = ({ imgSrc, imgAlt, carName, rating, price, seats, transmissio
             <span className="text-2xl font-bold text-foreground">₱{price.toLocaleString()}</span>
             <span className="text-sm text-muted-foreground">/day</span>
           </div>
-          <Button className="rounded-full gap-2 group/btn bg-blue-400">
+          <Button 
+            className="rounded-full gap-2 group/btn bg-blue-400" 
+            onClick={() => navigate(`/products/${_id}`)}
+          >
             Rent Now
             <ArrowRight size={16} className="group-hover/btn:translate-x-0.5 transition-transform" />
           </Button>
