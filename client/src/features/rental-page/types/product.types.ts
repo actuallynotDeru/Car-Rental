@@ -25,7 +25,6 @@ export interface Car {
   name: string
   price: number
   carDetails: {
-    carType: string
     seats: number
     transmission: string
     fuelType: string
@@ -38,10 +37,10 @@ export interface Car {
   updatedAt: Date
 }
 
-export interface Bookings{
+export interface Bookings {
   _id: string
   carId: Car["_id"]
   pickupDate: Date
   returnDate: Date
-  status: "Confirmed"
+  status: string
 }
