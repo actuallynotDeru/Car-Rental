@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,6 +18,11 @@ import { pendingCount, approvedCount, rejectedCount } from "./utils/count"
 
 const MotionCard = motion(Card);
 
+interface UserData {
+  _id: string
+  role: string
+}
+
 const AdminUserApplicationPage = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("All")
@@ -24,6 +30,9 @@ const AdminUserApplicationPage = () => {
   const [applications, setApplications] = useState<Application[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [user, setUser] = useState<UserData | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const navigate = useNavigate();
   
   useEffect(() => {
     const fetchApplications = async() => {
@@ -41,6 +50,25 @@ const AdminUserApplicationPage = () => {
     }
     fetchApplications()
   }, [])
+  
+  useEffect(() => {
+    const useStr = localStorage.getItem('user');
+    if(useStr) {
+      try {
+        const userData = JSON.parse(useStr);
+        setUser(userData);
+      } catch(err) {
+        console.error("Error parsing user data: ", err);
+      }
+    }
+    setAuthChecked(true);
+  }, [])
+  
+  useEffect(() => {
+    if (!authChecked) return;
+    
+    if (!user || user.role !== "Admin") navigate("/");
+  }, [authChecked, user, navigate])
 
   const filteredApplications = useMemo(() => {
     const filtered = applications.filter((app) => {

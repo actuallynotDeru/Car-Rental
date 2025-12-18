@@ -32,6 +32,7 @@ const ApplicationForm = () => {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitted, setSubmitted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [authChecked, setAuthChecked] = useState(false)
   const navigate = useNavigate()
   
   useEffect(() => {
@@ -44,13 +45,14 @@ const ApplicationForm = () => {
         console.error("Error parsing user data: ", err);
       }
     }
+    setAuthChecked(true);
   }, [])
   
   useEffect(() => {
-    if (!user) return;
+    if (!authChecked) return;
     
-    if (user.role !== "Customer") navigate("/");
-  })
+    if (!user || user.role !== "Customer") navigate("/");
+  }, [authChecked, user, navigate])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = e.target

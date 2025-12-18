@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogTrigger} from "@/components/ui/dialog"
-import { X, Search, Calendar, User, Car, FileText, CheckCircle, XCircle, Eye, ArrowLeft, Check } from "lucide-react"
+import { X, Search, Calendar, User, Car, FileText, Eye, ArrowLeft } from "lucide-react"
 import { calculateDays, formatDate, getStatusBadge } from "./utils/booking-review.utils"
 import DetailsModal from "./components/details-modal";
 import { getOwnerBookings, updateBookingStatus } from "./api/booking-review.api"
@@ -14,6 +14,11 @@ import type { Booking } from "./types/booking-review.types"
 import BookingActionButtons from "./components/status-buttons"
 import { motion } from "framer-motion"
 import { BookingReviewAnimations } from "./animations/booking-review.animations"
+
+interface UserData {
+  _id: string
+  role: string
+}
 
 const MotionCard = motion.create(Card);
 
@@ -25,10 +30,33 @@ const BookingApplication = () => {
     status: "all",
     car: "all",
   });
+  const [user, setUser] = useState<UserData | null>(null);
   const [selectedApplication, setSelectedApplication] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
   const currentOwnerId = userId;
+  
+  useEffect(() => {
+    const userStr = localStorage.getItem('user')
+    if(userStr) {
+      try {
+        const userData = JSON.parse(userStr)
+        setUser(userData);
+      } catch(err) {
+        console.error("Error parsing user data: ", err);
+      }
+    }
+    setAuthChecked(true);
+  }, [])
+  
+  useEffect(() => {
+    if (!authChecked) return;
+    
+    if(!user || user.role !== "CarOwner" || !currentOwnerId || user._id !== currentOwnerId) {
+      navigate("/", { replace: true });
+    }
+  }, [authChecked, user, currentOwnerId, navigate])
   
   useEffect(() => {
     if(!currentOwnerId) return

@@ -23,9 +23,8 @@ interface UserData {
 const MotionCard = motion.create(Card);
 
 export default function FleetPage() {
-  // Mock current car owner - Replace with actual auth
   const { userId } = useParams<{ userId: string }>();
-  const currentOwnerId = userId // Replace with actual user ID from auth
+  const currentOwnerId = userId
   const navigate = useNavigate()
 
   const [user, setUser] = useState<UserData | null>(null)
@@ -38,6 +37,7 @@ export default function FleetPage() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [addDialogOpen, setAddDialogOpen] = useState(false)
+  const [authChecked, setAuthChecked] = useState(false)
 
   const [formData, setFormData] = useState({
     name: "",
@@ -60,15 +60,14 @@ export default function FleetPage() {
         console.error("Error parsing user data: ", err);
       }
     }
+    setAuthChecked(true);
   }, [])
   
   useEffect(() => {
-    if (!user) return;
+    if (!authChecked) return;
     
-    if(user.role !== "CarOwner") {
-      navigate("/");
-    }
-  })
+    if (!user || user.role !== "CarOwner") navigate("/");
+  }, [authChecked, user, navigate])
 
   // Fetch cars on mount
   useEffect(() => {
