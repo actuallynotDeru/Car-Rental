@@ -36,3 +36,11 @@ export interface Car {
   createdAt: Date
   updatedAt: Date
 }
+
+export interface Bookings{
+  _id: string
+  carId: Car["_id"]
+  pickupDate: Date
+  returnDate: Date
+  status: "Confirmed"
+}
