@@ -20,6 +20,12 @@ const carsSchema = new mongoose.Schema({
     },
 
     carDetails: {
+        carType: {
+            type: String,
+            enum: ["Luxury", "Sedan", "Van", "SUV", "Hatchback", "Sports"],
+            required: true
+        },
+
         seats: {
             type: Number,
             required: true
