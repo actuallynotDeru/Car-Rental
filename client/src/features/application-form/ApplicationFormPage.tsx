@@ -9,6 +9,8 @@ import axios from "axios"
 import type { ApplicationFormData } from "./types/application-form.types"
 import { motion } from "framer-motion"
 import { ApplicationFormAnimations } from "./animations/application-form.animations"
+import { validateForm } from "./utils/validate"
+import { Submitted } from "./components/status"
 
 interface UserData {
   _id: string
@@ -30,6 +32,7 @@ const ApplicationForm = () => {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitted, setSubmitted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [authChecked, setAuthChecked] = useState(false)
   const navigate = useNavigate()
   
   useEffect(() => {
@@ -42,13 +45,14 @@ const ApplicationForm = () => {
         console.error("Error parsing user data: ", err);
       }
     }
+    setAuthChecked(true);
   }, [])
   
   useEffect(() => {
-    if (!user) return;
+    if (!authChecked) return;
     
-    if (user.role !== "Customer") navigate("/");
-  })
+    if (!user || user.role !== "Customer") navigate("/");
+  }, [authChecked, user, navigate])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = e.target
@@ -95,58 +99,8 @@ const ApplicationForm = () => {
       }
   }
 
-  const validateForm = () => {
-      const newErrors: Record<string, string> = {}
-
-      if(!formData.businessName.trim()) {
-          newErrors.businessName = 'Business name is required'
-      } else if(formData.businessName.length > 100) {
-          newErrors.businessName = 'Must be less than 100 characters'
-      }
-
-      if(!formData.businessAddress.trim()) {
-          newErrors.businessAddress = 'Business Address is required'
-      } else if(formData.businessAddress.length > 100) {
-          newErrors.businessAddress = 'Must be less than 100 characters'
-      }
-
-      if(!formData.businessPhone.trim()) {
-          newErrors.businessPhone = 'Business phone is required'
-      } else if(!/^\+?[\d\s\-()]+$/.test(formData.businessPhone)) {
-          newErrors.businessPhone = 'Invalid phone number'
-      }
-
-      if (!formData.businessEmail.trim()) {
-          newErrors.businessEmail = 'Business email is required'
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.businessEmail)) {
-          newErrors.businessEmail = 'Invalid email'
-      } else if (formData.businessEmail.length > 50) {
-          newErrors.businessEmail = 'Must be less than 50 characters'
-      }
-
-      if (!formData.taxId.trim()) {
-          newErrors.taxId = 'Tax ID is required'
-      } else if (formData.taxId.length > 20) {
-          newErrors.taxId = 'Must be less than 20 characters'
-      }
-
-      if (formData.description && formData.description.length > 500) {
-          newErrors.description = 'Must be less than 500 characters'
-      }
-
-      if (!formData.drivingLicense) {
-          newErrors.drivingLicense = 'Driving license is required'
-      }
-
-      if (!formData.businessLicense) {
-          newErrors.businessLicense = 'Business license is required'
-      }
-
-      return newErrors
-  }
-
   const handleSubmit = async () => {
-    const newErrors = validateForm();
+    const newErrors = validateForm(formData);
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -214,15 +168,7 @@ const ApplicationForm = () => {
 
   if(submitted) {
       return(
-          <motion.div variants = { ApplicationFormAnimations.success } initial = "hidden" animate = "visible" className = "min-h-screen bg-white flex items-center justify-center p-8">
-              <div className = "text-center max-w-md">
-                  <div className = "flex justify-center mb-6">
-                      <CheckCircle className = "size-20 text-green-500" />
-                  </div>
-                  <h2 className = "text-3xl font-bold text-gray-900 mb-3">Application Submitted!</h2>
-                  <p className = "text-gray-600 text-lg">Your car owner application has been successfully submitted.</p>
-              </div>
-          </motion.div>
+        <Submitted />
       )
   }
 

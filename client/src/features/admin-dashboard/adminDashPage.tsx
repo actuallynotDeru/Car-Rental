@@ -8,6 +8,12 @@ import { getCars } from "../admin-cars/api/car.api"
 import { getBookings } from "../admin-bookings/api/bookings.api"
 import { motion } from "framer-motion"
 import { DashboardAnimations } from "./animations/admin-dashboard.animations"
+import { useNavigate } from "react-router-dom"
+
+interface UserData {
+  _id: string
+  role: string
+}
 
 const MotionCard = motion(Card);
 
@@ -16,6 +22,9 @@ const AdminDashboard = () => {
   const [cars, setCars] = useState<Car[]>([])
   const [bookings, setBookings] = useState<Bookings[]>([])
   const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<UserData | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const navigate = useNavigate();
   
   useEffect(() => {
     const fetchData = async() => {
@@ -38,6 +47,25 @@ const AdminDashboard = () => {
     }
     fetchData();
   }, [])
+  
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if(userStr) {
+      try {
+        const userData = JSON.parse(userStr);
+        setUser(userData);
+      } catch(err) {
+        console.error("Error parsing user data: ", err);
+      }
+    }
+    setAuthChecked(true);
+  }, [])
+  
+  useEffect(() => {
+    if (!authChecked) return;
+    
+    if (!user || user.role !== "Admin") navigate("/");
+  }, [authChecked, user, navigate])
 
   // Replace the hardcoded numbers with fetched counts when API is ready.
   const metrics: Metric[] = [

@@ -2,23 +2,17 @@ import mongoose from "mongoose";
 
 const carsSchema = new mongoose.Schema({
 
-    ownerId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-    },
+  ownerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 
-    name: {
-        type: String,
-        required: true,
-        maxlength: 50,
-    },
-
-    price: {
-        type: Number,
-        required: true,
-    },
-
+  name: {
+    type: String,
+    required: true,
+    maxlength: 50,
+  },
     carDetails: {
         carType: {
             type: String,
@@ -31,51 +25,62 @@ const carsSchema = new mongoose.Schema({
             required: true
         },
 
-        transmission: {
-            type: String,
-            required: true,
-            maxlength: 50,
-        },
+  price: {
+    type: Number,
+    required: true,
+  },
 
-        fuelType: {
-            type: String,
-            required: true,
-            maxlength: 50,
-        },
-
-        plateNumber: {
-            type: String,
-            required: true,
-            maxlength: 20,
-        }
-    },
-
-    rating: {
+  carDetails: {
+    seats: {
         type: Number,
-        default: 5.0,
-        max: 5,
-        min: 0,
+        required: true
     },
 
-    image: {
+    transmission: {
         type: String,
         required: true,
-        maxlength: 255,
+        maxlength: 50,
     },
 
-    status: {
-        type: String,
-        enum: ["Available", "Unavailable"],
-        default: "Available"
-    },
-    
-    description: {
+    fuelType: {
       type: String,
-    },
-    
-    location: {
+      required: true,
+      maxlength: 50,
+  },
+
+    plateNumber: {
       type: String,
-    }
+      required: true,
+      maxlength: 20,
+  }
+  },
+
+  rating: {
+    type: Number,
+    default: 5.0,
+    max: 5,
+    min: 0,
+  },
+
+  image: {
+    type: String,
+    required: true,
+    maxlength: 255,
+  },
+
+  status: {
+    type: String,
+    enum: ["Available", "Unavailable"],
+    default: "Available"
+  },
+  
+  description: {
+    type: String,
+  },
+  
+  location: {
+    type: String,
+  }
 
 }, {timestamps: true})
 

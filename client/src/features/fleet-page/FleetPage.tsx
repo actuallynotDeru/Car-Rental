@@ -6,21 +6,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Car, Plus, Search, Edit2, Trash2, Fuel, Users, Settings2, Star, TrendingUp, Calendar, ArrowLeft, Loader2 } from "lucide-react"
+import { Car, Plus, Search, Edit2, Trash2, Fuel, Users, Settings2, Star, TrendingUp, Calendar, ArrowLeft } from "lucide-react"
 import StatCard from "./components/stat-cards"
 import EditModal from "./components/edit-modal"
 import { FleetAPI } from "./api/fleet.api"
-import type { Car as CarType } from "./types/fleet.types"
+import type { Car as CarType, CarFormData } from "./types/fleet.types"
+import { Error, Loading } from "./components/status"
+import { motion } from "framer-motion"
+import { FleetAnimations } from "./animations/fleet.animations"
+import { API_BASE_URL } from "@/config/apiURL"
+import { SERVER_BASE_URL } from "@/config/serverURL"
 
 interface UserData {
   _id: string
   role: string
 }
 
+const MotionCard = motion.create(Card);
+
 export default function FleetPage() {
-  // Mock current car owner - Replace with actual auth
   const { userId } = useParams<{ userId: string }>();
-  const currentOwnerId = userId // Replace with actual user ID from auth
+  const currentOwnerId = userId
   const navigate = useNavigate()
 
   const [user, setUser] = useState<UserData | null>(null)
@@ -33,15 +39,19 @@ export default function FleetPage() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [addDialogOpen, setAddDialogOpen] = useState(false)
+  const [authChecked, setAuthChecked] = useState(false)
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({})
+  const [isSaving, setIsSaving] = useState(false)
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CarFormData>({
     name: "",
     price: "",
     seats: "",
     transmission: "Automatic",
     fuelType: "Gasoline",
     plateNumber: "",
-    image: "",
+    image: null,
+    imagePreview: "",
     status: "Available",
   })
   
@@ -55,15 +65,14 @@ export default function FleetPage() {
         console.error("Error parsing user data: ", err);
       }
     }
+    setAuthChecked(true);
   }, [])
   
   useEffect(() => {
-    if (!user) return;
+    if (!authChecked) return;
     
-    if(user.role !== "CarOwner") {
-      navigate("/");
-    }
-  })
+    if (!user || user.role !== "CarOwner") navigate("/");
+  }, [authChecked, user, navigate])
 
   // Fetch cars on mount
   useEffect(() => {
@@ -136,9 +145,45 @@ export default function FleetPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: '' }))
+    }
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files && e.target.files[0]
+    if (file) {
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        setFormErrors((prev) => ({ ...prev, image: 'File size must be less than 5MB' }))
+        return
+      }
+
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+      if (!allowedTypes.includes(file.type)) {
+        setFormErrors((prev) => ({ ...prev, image: 'Only image files are allowed (jpeg, jpg, png, webp)' }))
+        return
+      }
+
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file)
+      setFormData((prev) => ({ ...prev, image: file, imagePreview: previewUrl }))
+      setFormErrors((prev) => ({ ...prev, image: '' }))
+    }
+  }
+
+  const removeImage = () => {
+    if (formData.imagePreview && formData.imagePreview.startsWith('blob:')) {
+      URL.revokeObjectURL(formData.imagePreview)
+    }
+    setFormData((prev) => ({ ...prev, image: null, imagePreview: '' }))
   }
 
   const resetForm = () => {
+    if (formData.imagePreview && formData.imagePreview.startsWith('blob:')) {
+      URL.revokeObjectURL(formData.imagePreview)
+    }
     setFormData({
       name: "",
       price: "",
@@ -146,14 +191,20 @@ export default function FleetPage() {
       transmission: "Automatic",
       fuelType: "Gasoline",
       plateNumber: "",
-      image: "",
+      image: null,
+      imagePreview: "",
       status: "Available",
     })
+    setFormErrors({})
     setEditingCar(null)
   }
 
   const openEditModal = (car: CarType) => {
     setEditingCar(car)
+    // Build the full image URL for preview
+    const imageUrl = car.image.startsWith('/uploads') 
+      ? `${API_BASE_URL.replace('/api', '')}${car.image}` 
+      : car.image
     setFormData({
       name: car.name,
       price: car.price.toString(),
@@ -161,48 +212,84 @@ export default function FleetPage() {
       transmission: car.carDetails.transmission,
       fuelType: car.carDetails.fuelType,
       plateNumber: car.carDetails.plateNumber,
-      image: car.image,
+      image: null, // No new file selected yet
+      imagePreview: imageUrl, // Show existing image
       status: car.status,
     })
+    setFormErrors({})
     setEditDialogOpen(true)
   }
 
   const handleSave = async () => {
-    try {
-      const carData = {
-        name: formData.name,
-        price: Number(formData.price),
-        carDetails: {
-          seats: Number(formData.seats),
-          transmission: formData.transmission,
-          fuelType: formData.fuelType,
-          plateNumber: formData.plateNumber,
-        },
-        image: formData.image || "/placeholder-car.png",
-        status: formData.status as "Available" | "Unavailable",
-      }
+    // Validate required fields
+    const errors: Record<string, string> = {}
+    if (!formData.name.trim()) errors.name = 'Vehicle name is required'
+    if (!formData.price || Number(formData.price) <= 0) errors.price = 'Valid price is required'
+    if (!formData.seats || Number(formData.seats) <= 0) errors.seats = 'Valid seat count is required'
+    if (!formData.plateNumber.trim()) errors.plateNumber = 'Plate number is required'
+    
+    // For new cars, image is required
+    if (!editingCar && !formData.image) {
+      errors.image = 'Car image is required'
+    }
 
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors)
+      return
+    }
+
+    setIsSaving(true)
+
+    try {
       if (editingCar) {
         // Update existing car
-        const updated = await FleetAPI.updateCar(editingCar._id!, carData)
+        const updateData = {
+          name: formData.name,
+          price: Number(formData.price),
+          carDetails: {
+            seats: Number(formData.seats),
+            transmission: formData.transmission,
+            fuelType: formData.fuelType,
+            plateNumber: formData.plateNumber,
+          },
+          status: formData.status,
+          ...(formData.image && { image: formData.image }),
+        }
+        const updated = await FleetAPI.updateCar(editingCar._id!, updateData)
         setOwnerCars((prev) =>
           prev.map((car) => (car._id === editingCar._id ? updated : car))
         )
         setEditDialogOpen(false)
       } else {
         // Create new car
-        const newCar = await FleetAPI.createCar({
-          ...carData,
+        if (!currentOwnerId) {
+          setFormErrors({ submit: 'Owner ID is required' })
+          return
+        }
+        const createData = {
           ownerId: currentOwnerId,
+          name: formData.name,
+          price: Number(formData.price),
+          carDetails: {
+            seats: Number(formData.seats),
+            transmission: formData.transmission,
+            fuelType: formData.fuelType,
+            plateNumber: formData.plateNumber,
+          },
           rating: 5.0,
-        })
+          image: formData.image!,
+          status: formData.status,
+        }
+        const newCar = await FleetAPI.createCar(createData)
         setOwnerCars((prev) => [...prev, newCar])
         setAddDialogOpen(false)
       }
       resetForm()
     } catch (err) {
       console.error("Error saving car:", err)
-      alert("Failed to save car. Please try again.")
+      setFormErrors({ submit: 'Failed to save car. Please try again.' })
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -219,41 +306,21 @@ export default function FleetPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-slate-600">Loading your fleet...</p>
-        </div>
-      </div>
+      <Loading />
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
-        <div className="max-w-7xl mx-auto">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/")}
-            className="mb-4 gap-2 hover:cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </Button>
-          <Card className="p-12 text-center">
-            <p className="text-destructive mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()}>Try Again</Button>
-          </Card>
-        </div>
-      </div>
+      <Error err = {error} />
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+    <motion.div variants={FleetAnimations.container} initial = "hidden" animate = "visible" className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <motion.div variants={FleetAnimations.header} initial = "hidden" animate = "visible" className="mb-8">
           <Button
             variant="ghost"
             onClick={() => navigate("/")}
@@ -264,10 +331,10 @@ export default function FleetPage() {
           </Button>
           <h1 className="text-3xl font-bold text-slate-900">Your Fleet</h1>
           <p className="text-slate-600 mt-1">{filteredCars.length} car{filteredCars.length !== 1 ? "s" : ""} in your fleet</p>
-        </div>
+        </motion.div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <motion.div variants={FleetAnimations.statsGrid} initial = "hidden" animate = "visible" className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           {stats.map((stat, index) => (
             <StatCard
               key={index}
@@ -277,10 +344,10 @@ export default function FleetPage() {
               iconColor={stat.iconColor}
             />
           ))}
-        </div>
+        </motion.div>
 
         {/* Filters and Add Button */}
-        <Card className="bg-transparent shadow-md mb-6 border border-slate-300">
+        <MotionCard variants={FleetAnimations.filtersCard} initial = "hidden" animate = "visible" className="bg-transparent shadow-md mb-6 border border-slate-300">
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
               <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
@@ -316,7 +383,7 @@ export default function FleetPage() {
               </Button>
             </div>
           </CardContent>
-        </Card>
+        </MotionCard>
 
         {filteredCars.length === 0 ? (
           <Card className="border-0 shadow-sm">
@@ -328,12 +395,13 @@ export default function FleetPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <motion.div variants={FleetAnimations.carsGrid} initial = "hidden" animate = "visible" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCars.map((car) => (
-              <Card key={car._id} className="shadow-sm overflow-hidden hover:shadow-2xl transition-shadow border border-gray-300">
+              <MotionCard variants={FleetAnimations.carCard} initial = "hidden" animate = "visible" whileHover = {FleetAnimations.carCardHover.hover} key={car._id} className="shadow-sm overflow-hidden hover:shadow-2xl transition-shadow border border-gray-300">
                 <div className="relative">
-                  <img
-                    src={car.image || "/placeholder.svg?height=200&width=400&query=car"}
+                  <motion.img
+                    variants={FleetAnimations.carImage} initial = "hidden" animate = "visible"
+                    src={`${SERVER_BASE_URL}${car.image}`}
                     alt={car.name}
                     className="w-full h-48 object-cover bg-slate-100"
                   />
@@ -408,9 +476,9 @@ export default function FleetPage() {
                     </div>
                   </div>
                 </CardContent>
-              </Card>
+              </MotionCard>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
 
@@ -423,7 +491,11 @@ export default function FleetPage() {
         }}
         formData={formData}
         onInputChange={handleInputChange}
+        onFileChange={handleFileChange}
+        onRemoveImage={removeImage}
         onSave={handleSave}
+        errors={formErrors}
+        isSaving={isSaving}
         mode="add"
       />
 
@@ -436,9 +508,13 @@ export default function FleetPage() {
         }}
         formData={formData}
         onInputChange={handleInputChange}
+        onFileChange={handleFileChange}
+        onRemoveImage={removeImage}
         onSave={handleSave}
+        errors={formErrors}
+        isSaving={isSaving}
         mode="edit"
       />
-    </div>
+    </motion.div>
   )
 }

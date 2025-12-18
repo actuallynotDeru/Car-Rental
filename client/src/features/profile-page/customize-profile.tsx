@@ -10,6 +10,11 @@ import { ProfileAPI } from "./api/profile.api";
 import type { UserProfile } from "./types/profile.types";
 import { SERVER_BASE_URL } from "@/config/serverURL";
 
+interface UserData {
+  _id: string
+  role: string
+}
+
 const CustomizeProfile = () => {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
@@ -23,6 +28,8 @@ const CustomizeProfile = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [user, setUser] = useState<UserData | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -41,6 +48,25 @@ const CustomizeProfile = () => {
 
     fetchProfile();
   }, [userId]);
+  
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if(userStr) {
+      try {
+        const userData = JSON.parse(userStr);
+        setUser(userData);
+      } catch(err) {
+        console.error("Error parsing user data: ", err);
+      }
+    }
+    setAuthChecked(true);
+  }, [])
+  
+  useEffect(() => {
+    if (!authChecked) return;
+    
+    if (!user) navigate("/");
+  }, [authChecked, user, navigate])
 
   useEffect(() => {
     if (!selectedFile) {
