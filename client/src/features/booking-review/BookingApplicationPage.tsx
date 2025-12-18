@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -7,11 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogTrigger} from "@/components/ui/dialog"
 import { X, Search, Calendar, User, Car, FileText, CheckCircle, XCircle, Eye, ArrowLeft, Check } from "lucide-react"
 import { calculateDays, formatDate, getStatusBadge } from "./utils/booking-review.utils"
-import { useNavigate, useParams } from "react-router-dom"
 import DetailsModal from "./components/details-modal";
 import { getOwnerBookings, updateBookingStatus } from "./api/booking-review.api"
 import type { Booking } from "./types/booking-review.types"
 import BookingActionButtons from "./components/status-buttons"
+import { motion } from "framer-motion"
+import { BookingReviewAnimations } from "./animations/booking-review.animations"
+
+const MotionCard = motion.create(Card);
 
 const BookingApplication = () => {
   const [applications, setApplications] = useState<Booking[]>([]);
@@ -126,7 +130,7 @@ const BookingApplication = () => {
   }, [applications]);
   
   return(
-    <div className = "flex-1 overflow-auto p-12">
+    <motion.div variants={BookingReviewAnimations.container} initial = "hidden" animate = "visible" className = "flex-1 overflow-auto p-12">
       <Button
         variant="ghost"
         onClick={() => navigate("/")}
@@ -136,13 +140,13 @@ const BookingApplication = () => {
         Back
       </Button>
       
-      <div className = "mb-8">
+      <motion.div variants={BookingReviewAnimations.header} initial = "hidden" animate = "visible" className = "mb-8">
         <h1 className = "text-3xl font-bold text-foreground mb-2">Car Rental Applications</h1>
         <p className = "text-muted-foreground">Review and manage rental requests for your vehicles</p>
-      </div>
+      </motion.div>
       
       {/* Filters Card */}
-      <Card className = "p-6 mb-6">
+      <MotionCard variants={BookingReviewAnimations.filterCard} initial = "hidden" animate = "visible" className = "p-6 mb-6">
         <div className = "space-y-3">
           <div className = "flex gap-2 flex-wrap items-end">
             <div className = "flex-1 min-w-[200px]">
@@ -208,16 +212,16 @@ const BookingApplication = () => {
             )}
           </div>
         </div>
-      </Card>
+      </MotionCard>
       
       {/* Applications Grid */}
-      <div className = "grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <motion.div variants={BookingReviewAnimations.gridContainer} initial = "hidden" animate = "visible" className = "grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredApplications.map((application) => {
           const customer = typeof application.customerId === 'object' ? application.customerId : null;
           const car = typeof application.carId === 'object' ? application.carId : null;
 
           return (
-            <Card key={application._id} className="p-6 hover:shadow-lg transition-shadow">
+            <MotionCard variants = {BookingReviewAnimations.applicationCard} initial = "hidden" animate = "visible" whileHover = {BookingReviewAnimations.cardHover.hover} key={application._id} className="p-6 hover:shadow-lg transition-shadow">
               <div className="space-y-4">
                 {/* Header */}
                 <div className="flex items-start justify-between">
@@ -230,9 +234,9 @@ const BookingApplication = () => {
                       <p className="text-sm text-muted-foreground">{customer?.email || 'N/A'}</p>
                     </div>
                   </div>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusBadge(application.status)}`}>
+                  <motion.span variants={BookingReviewAnimations.statusBadge} initial = "hidden" animate = "visible" className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusBadge(application.status)}`}>
                     {application.status}
-                  </span>
+                  </motion.span>
                 </div>
                 
                 {/* Car Details */}
@@ -272,7 +276,7 @@ const BookingApplication = () => {
                 </div>
 
                 {/* Actions */}
-                <div className = "flex gap-2 pt-2">
+                <motion.div variants={BookingReviewAnimations.actionButtons} initial = "hidden" animate = "visible" className = "flex gap-2 pt-2">
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button 
@@ -298,15 +302,15 @@ const BookingApplication = () => {
                     onComplete={handleCompleted}
                   />
 
-                </div>
+                </motion.div>
               </div>
-            </Card>
+            </MotionCard>
           );
         })}
-      </div>
+      </motion.div>
 
       {filteredApplications.length === 0 && (
-        <Card className = "p-12">
+        <MotionCard variants={BookingReviewAnimations.noResults} initial = "hidden" animate = "visible" className = "p-12">
           <div className = "text-center">
             <FileText className = "size-12 text-muted-foreground mx-auto mb-4" />
             <h3 className = "text-lg font-semibold text-foreground mb-2">No applications found</h3>
@@ -314,9 +318,9 @@ const BookingApplication = () => {
               {hasActiveFilters ? "Try adjusting your filters" : "No rental applications yet"}
             </p>
           </div>
-        </Card>
+        </MotionCard>
       )}
-    </div>
+    </motion.div>
   )
 }
 

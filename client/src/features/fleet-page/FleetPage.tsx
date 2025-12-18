@@ -11,11 +11,16 @@ import StatCard from "./components/stat-cards"
 import EditModal from "./components/edit-modal"
 import { FleetAPI } from "./api/fleet.api"
 import type { Car as CarType } from "./types/fleet.types"
+import { Error, Loading } from "./components/status"
+import { motion } from "framer-motion"
+import { FleetAnimations } from "./animations/fleet.animations"
 
 interface UserData {
   _id: string
   role: string
 }
+
+const MotionCard = motion.create(Card);
 
 export default function FleetPage() {
   // Mock current car owner - Replace with actual auth
@@ -219,41 +224,21 @@ export default function FleetPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-slate-600">Loading your fleet...</p>
-        </div>
-      </div>
+      <Loading />
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
-        <div className="max-w-7xl mx-auto">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/")}
-            className="mb-4 gap-2 hover:cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </Button>
-          <Card className="p-12 text-center">
-            <p className="text-destructive mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()}>Try Again</Button>
-          </Card>
-        </div>
-      </div>
+      <Error err = {error} />
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+    <motion.div variants={FleetAnimations.container} initial = "hidden" animate = "visible" className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <motion.div variants={FleetAnimations.header} initial = "hidden" animate = "visible" className="mb-8">
           <Button
             variant="ghost"
             onClick={() => navigate("/")}
@@ -264,10 +249,10 @@ export default function FleetPage() {
           </Button>
           <h1 className="text-3xl font-bold text-slate-900">Your Fleet</h1>
           <p className="text-slate-600 mt-1">{filteredCars.length} car{filteredCars.length !== 1 ? "s" : ""} in your fleet</p>
-        </div>
+        </motion.div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <motion.div variants={FleetAnimations.statsGrid} initial = "hidden" animate = "visible" className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           {stats.map((stat, index) => (
             <StatCard
               key={index}
@@ -277,10 +262,10 @@ export default function FleetPage() {
               iconColor={stat.iconColor}
             />
           ))}
-        </div>
+        </motion.div>
 
         {/* Filters and Add Button */}
-        <Card className="bg-transparent shadow-md mb-6 border border-slate-300">
+        <MotionCard variants={FleetAnimations.filtersCard} initial = "hidden" animate = "visible" className="bg-transparent shadow-md mb-6 border border-slate-300">
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
               <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
@@ -316,7 +301,7 @@ export default function FleetPage() {
               </Button>
             </div>
           </CardContent>
-        </Card>
+        </MotionCard>
 
         {filteredCars.length === 0 ? (
           <Card className="border-0 shadow-sm">
@@ -328,11 +313,12 @@ export default function FleetPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <motion.div variants={FleetAnimations.carsGrid} initial = "hidden" animate = "visible" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCars.map((car) => (
-              <Card key={car._id} className="shadow-sm overflow-hidden hover:shadow-2xl transition-shadow border border-gray-300">
+              <MotionCard variants={FleetAnimations.carCard} initial = "hidden" animate = "visible" whileHover = {FleetAnimations.carCardHover.hover} key={car._id} className="shadow-sm overflow-hidden hover:shadow-2xl transition-shadow border border-gray-300">
                 <div className="relative">
-                  <img
+                  <motion.img
+                    variants={FleetAnimations.carImage} initial = "hidden" animate = "visible"
                     src={car.image || "/placeholder.svg?height=200&width=400&query=car"}
                     alt={car.name}
                     className="w-full h-48 object-cover bg-slate-100"
@@ -408,9 +394,9 @@ export default function FleetPage() {
                     </div>
                   </div>
                 </CardContent>
-              </Card>
+              </MotionCard>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
 
@@ -439,6 +425,6 @@ export default function FleetPage() {
         onSave={handleSave}
         mode="edit"
       />
-    </div>
+    </motion.div>
   )
 }
