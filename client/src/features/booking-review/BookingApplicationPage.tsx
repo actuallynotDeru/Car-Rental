@@ -11,6 +11,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import DetailsModal from "./components/details-modal";
 import { getOwnerBookings, updateBookingStatus } from "./api/booking-review.api"
 import type { Booking } from "./types/booking-review.types"
+import BookingActionButtons from "./components/status-buttons"
 
 const BookingApplication = () => {
   const [applications, setApplications] = useState<Booking[]>([]);
@@ -288,41 +289,14 @@ const BookingApplication = () => {
                       <DetailsModal application={selectedApplication} />
                     </DialogContent>
                   </Dialog>
-
-                  {application.status === "Pending" && (
-                    <>
-                      <Button
-                        size="sm"
-                        className="flex-1 bg-green-600 hover:bg-green-700"
-                        onClick={() => handleApprove(application._id!)}
-                      >
-                        <CheckCircle className="size-4 mr-1" />
-                        Approve
-                      </Button>
-
-                      <Button
-                        size="sm"
-                        className="flex-1 bg-red-600 hover:bg-red-700"
-                        onClick={() => handleReject(application._id!)}
-                      >
-                        <XCircle className="size-4 mr-1" />
-                        Reject
-                      </Button>
-                    </>
-                  )}
                   
-                  {application.status === "Confirmed" && (
-                    <>
-                      <Button 
-                        size="sm"
-                        className="flex-1 bg-blue-600 hover:bg-blue-700"
-                        onClick={() => handleCompleted(application._id!)}
-                      >
-                        <Check className = "size-4 mr-1" />
-                        Completed
-                      </Button>
-                    </>
-                  )}
+                  <BookingActionButtons 
+                    status={application.status}
+                    bookingId={application._id!}
+                    onApprove={handleApprove}
+                    onReject={handleReject}
+                    onComplete={handleCompleted}
+                  />
 
                 </div>
               </div>

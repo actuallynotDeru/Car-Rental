@@ -17,6 +17,7 @@ import { getCars } from "./api/car.api"
 import type { Car } from "./types/cars.types"
 import { motion } from "framer-motion"
 import { CarsAnimations } from "./animations/admin-cars.animation"
+import { Loading, Error } from "./components/status"
 
 const MotionCard = motion(Card);
 
@@ -75,17 +76,13 @@ export default function CarsPage() {
 
   if(loading) {
     return (
-      <div className = "flex-1 flex items-center justify-center">
-        <p className = "text-muted-foreground">Loading users...</p>
-      </div>
+      <Loading />
     )
   }
   
   if(error) {
     return(
-      <div className = "flex-1 flex items-center justify-center">
-        <p className = "text-destructive">{ error }</p>
-      </div>
+      <Error err={error} />
     )
   }
   

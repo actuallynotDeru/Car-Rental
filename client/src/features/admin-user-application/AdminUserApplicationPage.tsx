@@ -12,6 +12,8 @@ import { getApplications } from "./api/application.api"
 import type { Application } from "./types/application.types"
 import { motion } from "framer-motion"
 import { UserApplicationAnimations } from "./animations/admin-user-application.animations"
+import { Error, Loading } from "./components/status"
+import { pendingCount, approvedCount, rejectedCount } from "./utils/count"
 
 const MotionCard = motion(Card);
 
@@ -60,23 +62,15 @@ const AdminUserApplicationPage = () => {
     return filtered
   }, [applications, searchTerm, statusFilter, sortBy])
 
-  const pendingCount = applications.filter((a) => a.status === "Pending").length
-  const approvedCount = applications.filter((a) => a.status === "Approved").length
-  const rejectedCount = applications.filter((a) => a.status === "Rejected").length
-
   if(loading) {
     return(
-      <div className = "flex-1 flex items-center justify-center">
-        <p className = "text-muted-foreground">Loading Applications...</p>
-      </div>
+      <Loading />
     )
   }
   
   if(error) {
     return (
-      <div className = "flex-1 flex items-center justify-center">
-        <p className="text-destructive">{error}</p>
-      </div>
+      <Error err = {error} />
     )
   }
   
@@ -93,7 +87,7 @@ const AdminUserApplicationPage = () => {
           <div className = "flex items-center justify-between">
             <div>
               <p className = "text-sm text-muted-foreground">Pending Reviews</p>
-              <p className = "text-3xl font-bold text-yellow-600 dark:text-yello-400">{pendingCount}</p>
+              <p className = "text-3xl font-bold text-yellow-600 dark:text-yello-400">{pendingCount(applications)}</p>
             </div>
             <Clock className = "size-8 text-yellow-600 dark:text-yellow-400"/>
           </div>
@@ -103,7 +97,7 @@ const AdminUserApplicationPage = () => {
           <div className = "flex items-center justify-between">
             <div>
               <p className = "text-sm text-muted-foreground">Approved</p>
-              <p className = "text-3xl font-bold text-green-600 dark:text-green-400">{approvedCount}</p>
+              <p className = "text-3xl font-bold text-green-600 dark:text-green-400">{approvedCount(applications)}</p>
             </div>
             <CheckCircle className = "size-8 text-green-600 dark:text-green-400"/>
           </div>
@@ -113,7 +107,7 @@ const AdminUserApplicationPage = () => {
           <div className = "flex items-center justify-between">
             <div>
               <p className = "text-sm text-muted-foreground">Rejected</p>
-              <p className = "text-3xl font-bold text-red-600 dark:text-red-400">{rejectedCount}</p>
+              <p className = "text-3xl font-bold text-red-600 dark:text-red-400">{rejectedCount(applications)}</p>
             </div>
             <XCircle className = "size-8 text-red-600 dark:text-red-400"/>
           </div>

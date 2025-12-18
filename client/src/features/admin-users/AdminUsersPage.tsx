@@ -11,6 +11,7 @@ import { getUsers } from "./api/user.api";
 import type { User } from "@/types";
 import { motion } from "framer-motion";
 import { UsersAnimations } from "./animations/admin-users.animations";
+import { Error, Loading } from "./components/status";
 
 const MotionCard = motion(Card);
 
@@ -24,7 +25,6 @@ const AdminUsers = () => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
-    // Fetch users from API on component mount
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -72,17 +72,13 @@ const AdminUsers = () => {
 
     if (loading) {
         return (
-            <div className="flex-1 flex items-center justify-center">
-                <p className="text-muted-foreground">Loading users...</p>
-            </div>
+          <Loading />
         )
     }
 
     if (error) {
         return (
-            <div className="flex-1 flex items-center justify-center">
-                <p className="text-destructive">{error}</p>
-            </div>
+          <Error err={error} />
         )
     }
 
