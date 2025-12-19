@@ -1,44 +1,18 @@
 import React from 'react';
 import RentalCard from "./rental-card";
+import type { BookingWithDetails } from "../types/profile.types";
+import { SERVER_BASE_URL } from "@/config/serverURL";
 
-// 1. Create some mock data to replicate the screenshot
-const recentCars = [
-  {
-    id: 1,
-    imgSrc: "https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_Model_3_at_Geneva_International_Motor_Show_2018_03.jpg", // Replace with your actual image path
-    imgAlt: "Red Tesla Model Y",
-    carName: "2024 Tesla Model Y",
-    rating: 4.6,
-    price: 1200,
-    seats: 5,
-    transmission: "Automatic",
-    type: "Electric",
-  },
-  {
-    id: 2,
-    imgSrc: "https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_Model_3_at_Geneva_International_Motor_Show_2018_03.jpg",
-    imgAlt: "Red Tesla Model Y",
-    carName: "2024 Tesla Model Y",
-    rating: 4.6,
-    price: 1200,
-    seats: 5,
-    transmission: "Automatic",
-    type: "Electric",
-  },
-  {
-    id: 3,
-    imgSrc: "https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_Model_3_at_Geneva_International_Motor_Show_2018_03.jpg",
-    imgAlt: "Red Tesla Model Y",
-    carName: "2024 Tesla Model Y",
-    rating: 4.6,
-    price: 1200,
-    seats: 5,
-    transmission: "Automatic",
-    type: "Electric",
-  },
-];
+interface PreviouslyBookedProps {
+    bookings: BookingWithDetails[];
+}
 
-const LastViewed = () => {
+const PreviouslyBooked: React.FC<PreviouslyBookedProps> = ({ bookings }) => {
+    // Filter only completed or confirmed bookings for "previously booked"
+    const previousBookings = bookings.filter(
+        (booking) => booking.status === "Completed" || booking.status === "Confirmed"
+    );
+
     return (
         <section className="py-10 max-w-7xl mx-auto">
             {/* Section Title */}
@@ -47,23 +21,43 @@ const LastViewed = () => {
             </h2>
 
             {/* Grid Layout */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
-                {recentCars.map((car) => (
-                    <RentalCard 
-                        key={car.id}
-                        imgSrc={car.imgSrc}
-                        imgAlt={car.imgAlt}
-                        carName={car.carName}
-                        rating={car.rating}
-                        price={car.price}
-                        seats={car.seats}
-                        transmission={car.transmission}
-                        type={car.type}
-                    />
-                ))}
-            </div>
+            {previousBookings.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+                    {previousBookings.map((booking) => {
+                        const car = booking.carId;
+                        
+                        // Skip if car data is not populated
+                        if (!car || typeof car === 'string') return null;
+
+                        const imageUrl = car.image 
+                            ? `${SERVER_BASE_URL}${car.image}` 
+                            : "https://via.placeholder.com/300x200?text=No+Image";
+
+                        return (
+                            <RentalCard 
+                                key={booking._id}
+                                imgSrc={imageUrl}
+                                imgAlt={car.name}
+                                carName={car.name}
+                                rating={car.rating || 4.5}
+                                price={car.price}
+                                seats={car.carDetails?.seats || 4}
+                                transmission={car.carDetails?.transmission || "Automatic"}
+                                type={car.carDetails?.fuelType || "Gasoline"}
+                            />
+                        );
+                    })}
+                </div>
+            ) : (
+                <div className="text-center py-10">
+                    <p className="text-gray-500 text-lg">No previous bookings found.</p>
+                    <p className="text-gray-400 text-sm mt-2">
+                        Your completed rentals will appear here.
+                    </p>
+                </div>
+            )}
         </section>
     );
 }
 
-export default LastViewed;
+export default PreviouslyBooked;

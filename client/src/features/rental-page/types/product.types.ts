@@ -25,6 +25,7 @@ export interface Car {
   name: string
   price: number
   carDetails: {
+    carType: string
     seats: number
     transmission: string
     fuelType: string

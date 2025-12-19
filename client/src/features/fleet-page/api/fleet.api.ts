@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "@/config/apiURL";
 import axios from "axios";
-import type { Car } from "../types/fleet.types";
+import type { Car, CreateCarRequest, UpdateCarRequest } from "../types/fleet.types";
 
 export const FleetAPI = {
   // Get all cars owned by a specific user
@@ -39,12 +39,32 @@ export const FleetAPI = {
     }
   },
 
-  // Create a new car
-  createCar: async (carData: Partial<Car>): Promise<Car> => {
+  // Create a new car with file upload
+  createCar: async (carData: CreateCarRequest): Promise<Car> => {
     try {
-      const res = await axios.post(`${API_BASE_URL}/cars`, carData, {
+      const formData = new FormData();
+      
+      console.log("Creating car with data:", carData);
+      console.log("carType value:", carData.carDetails.carType);
+      
+      formData.append("ownerId", carData.ownerId);
+      formData.append("name", carData.name);
+      formData.append("price", carData.price.toString());
+      formData.append("carType", carData.carDetails.carType || "Sedan");
+      formData.append("seats", carData.carDetails.seats.toString());
+      formData.append("transmission", carData.carDetails.transmission);
+      formData.append("fuelType", carData.carDetails.fuelType);
+      formData.append("plateNumber", carData.carDetails.plateNumber);
+      formData.append("status", carData.status);
+      formData.append("rating", (carData.rating || 5.0).toString());
+      
+      if (carData.image) {
+        formData.append("images", carData.image);
+      }
+      
+      const res = await axios.post(`${API_BASE_URL}/cars`, formData, {
         headers: { 
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
           Accept: 'application/json' 
         },
       });
@@ -59,12 +79,29 @@ export const FleetAPI = {
     }
   },
 
-  // Update car details
-  updateCar: async (carId: string, carData: Partial<Car>): Promise<Car> => {
+  // Update car details with optional file upload
+  updateCar: async (carId: string, carData: UpdateCarRequest): Promise<Car> => {
     try {
-      const res = await axios.put(`${API_BASE_URL}/cars/${carId}`, carData, {
+      const formData = new FormData();
+      
+      if (carData.name) formData.append("name", carData.name);
+      if (carData.price !== undefined) formData.append("price", carData.price.toString());
+      if (carData.carDetails) {
+        formData.append("carType", carData.carDetails.carType);
+        formData.append("seats", carData.carDetails.seats.toString());
+        formData.append("transmission", carData.carDetails.transmission);
+        formData.append("fuelType", carData.carDetails.fuelType);
+        formData.append("plateNumber", carData.carDetails.plateNumber);
+      }
+      if (carData.status) formData.append("status", carData.status);
+      
+      if (carData.image) {
+        formData.append("images", carData.image);
+      }
+      
+      const res = await axios.put(`${API_BASE_URL}/cars/${carId}`, formData, {
         headers: { 
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
           Accept: 'application/json' 
         },
       });

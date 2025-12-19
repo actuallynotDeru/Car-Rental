@@ -31,6 +31,8 @@ export interface Car {
     fuelType: string
     plateNumber: string
   }
+  description: string
+  location: string
   rating: number
   image: string
   status: "Available" | "Unavailable"

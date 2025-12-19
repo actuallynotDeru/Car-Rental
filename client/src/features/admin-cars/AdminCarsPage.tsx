@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -6,17 +7,17 @@ import { useState, useMemo, useEffect } from "react"
 import { Label } from "@/components/ui/label"
 import { Carcolumns } from "./components/cars-columns"
 import { CarsDataTable } from "./components/cars-data-table"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getCars } from "./api/car.api"
 import type { Car } from "./types/cars.types"
 import { motion } from "framer-motion"
 import { CarsAnimations } from "./animations/admin-cars.animation"
+import { Loading, Error } from "./components/status"
+
+interface UserData {
+  _id: string
+  role: string
+}
 
 const MotionCard = motion(Card);
 
@@ -30,6 +31,9 @@ export default function CarsPage() {
   const [cars, setCars] = useState<Car[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [user, setUser] = useState<UserData | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const navigate = useNavigate();
   
   useEffect(() => {
     const fetchCars = async() => {
@@ -47,6 +51,25 @@ export default function CarsPage() {
     }
     fetchCars()
   }, [])
+  
+  useEffect(() => {
+     const userStr = localStorage.getItem('user')
+     if(userStr) {
+       try {
+         const userData = JSON.parse(userStr);
+         setUser(userData);
+       } catch(err) {
+         console.error("Error parsing user data: ", err);
+       }
+     }
+    setAuthChecked(true);
+  }, [])
+  
+  useEffect(() => {
+    if (!authChecked) return;
+    
+    if (!user || user.role !== "Admin") navigate("/");
+  }, [authChecked, user, navigate])
 
   const filteredCars = useMemo(() => {
     return cars.filter((car) => {
@@ -75,17 +98,13 @@ export default function CarsPage() {
 
   if(loading) {
     return (
-      <div className = "flex-1 flex items-center justify-center">
-        <p className = "text-muted-foreground">Loading users...</p>
-      </div>
+      <Loading />
     )
   }
   
   if(error) {
     return(
-      <div className = "flex-1 flex items-center justify-center">
-        <p className = "text-destructive">{ error }</p>
-      </div>
+      <Error err={error} />
     )
   }
   

@@ -53,7 +53,7 @@ export function LoginForm({
       if (response.user.role === 'Admin') {
         navigate('/admin')
       } else if (response.user.role === 'CarOwner') {
-        navigate(`/fleet/${response.user._id}`)
+        navigate(`/`)
       } else {
         navigate('/')
       }

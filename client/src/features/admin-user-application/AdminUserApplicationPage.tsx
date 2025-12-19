@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,8 +13,15 @@ import { getApplications } from "./api/application.api"
 import type { Application } from "./types/application.types"
 import { motion } from "framer-motion"
 import { UserApplicationAnimations } from "./animations/admin-user-application.animations"
+import { Error, Loading } from "./components/status"
+import { pendingCount, approvedCount, rejectedCount } from "./utils/count"
 
 const MotionCard = motion(Card);
+
+interface UserData {
+  _id: string
+  role: string
+}
 
 const AdminUserApplicationPage = () => {
   const [searchTerm, setSearchTerm] = useState("")
@@ -22,6 +30,9 @@ const AdminUserApplicationPage = () => {
   const [applications, setApplications] = useState<Application[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [user, setUser] = useState<UserData | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const navigate = useNavigate();
   
   useEffect(() => {
     const fetchApplications = async() => {
@@ -39,6 +50,25 @@ const AdminUserApplicationPage = () => {
     }
     fetchApplications()
   }, [])
+  
+  useEffect(() => {
+    const useStr = localStorage.getItem('user');
+    if(useStr) {
+      try {
+        const userData = JSON.parse(useStr);
+        setUser(userData);
+      } catch(err) {
+        console.error("Error parsing user data: ", err);
+      }
+    }
+    setAuthChecked(true);
+  }, [])
+  
+  useEffect(() => {
+    if (!authChecked) return;
+    
+    if (!user || user.role !== "Admin") navigate("/");
+  }, [authChecked, user, navigate])
 
   const filteredApplications = useMemo(() => {
     const filtered = applications.filter((app) => {
@@ -60,23 +90,15 @@ const AdminUserApplicationPage = () => {
     return filtered
   }, [applications, searchTerm, statusFilter, sortBy])
 
-  const pendingCount = applications.filter((a) => a.status === "Pending").length
-  const approvedCount = applications.filter((a) => a.status === "Approved").length
-  const rejectedCount = applications.filter((a) => a.status === "Rejected").length
-
   if(loading) {
     return(
-      <div className = "flex-1 flex items-center justify-center">
-        <p className = "text-muted-foreground">Loading Applications...</p>
-      </div>
+      <Loading />
     )
   }
   
   if(error) {
     return (
-      <div className = "flex-1 flex items-center justify-center">
-        <p className="text-destructive">{error}</p>
-      </div>
+      <Error err = {error} />
     )
   }
   
@@ -93,7 +115,7 @@ const AdminUserApplicationPage = () => {
           <div className = "flex items-center justify-between">
             <div>
               <p className = "text-sm text-muted-foreground">Pending Reviews</p>
-              <p className = "text-3xl font-bold text-yellow-600 dark:text-yello-400">{pendingCount}</p>
+              <p className = "text-3xl font-bold text-yellow-600 dark:text-yello-400">{pendingCount(applications)}</p>
             </div>
             <Clock className = "size-8 text-yellow-600 dark:text-yellow-400"/>
           </div>
@@ -103,7 +125,7 @@ const AdminUserApplicationPage = () => {
           <div className = "flex items-center justify-between">
             <div>
               <p className = "text-sm text-muted-foreground">Approved</p>
-              <p className = "text-3xl font-bold text-green-600 dark:text-green-400">{approvedCount}</p>
+              <p className = "text-3xl font-bold text-green-600 dark:text-green-400">{approvedCount(applications)}</p>
             </div>
             <CheckCircle className = "size-8 text-green-600 dark:text-green-400"/>
           </div>
@@ -113,7 +135,7 @@ const AdminUserApplicationPage = () => {
           <div className = "flex items-center justify-between">
             <div>
               <p className = "text-sm text-muted-foreground">Rejected</p>
-              <p className = "text-3xl font-bold text-red-600 dark:text-red-400">{rejectedCount}</p>
+              <p className = "text-3xl font-bold text-red-600 dark:text-red-400">{rejectedCount(applications)}</p>
             </div>
             <XCircle className = "size-8 text-red-600 dark:text-red-400"/>
           </div>
