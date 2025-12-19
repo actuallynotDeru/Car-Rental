@@ -11,7 +11,7 @@ interface ReviewCardProps {
 const ReviewCard: React.FC<ReviewCardProps> = ({ message, name, pfp }) => {
     return (
         <motion.div variants = {MainAnimations.reviewCard} initial = "hidden" whileInView = "visible" whileHover = {MainAnimations.reviewCardHover.hover} className="w-[300px] h-[360px] px-7 py-7 flex flex-col bg-white rounded-2xl shadow-lg">
-            <p className="text-[#8D8D8D] mb-6 w-[260px] h-[220px] text-[14px]">
+            <p className="text-muted-foreground mb-6 w-[260px] h-[220px] text-[14px]">
                 {message}
             </p>
             <div className="flex items-center gap-4">

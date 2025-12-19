@@ -17,6 +17,7 @@ function makeCar(owner, plate) {
     name: `${pick(["Toyota","Honda","Ford","Chevrolet","Nissan","Hyundai","Kia","BMW","Audi","Mercedes"])} ${pick(["Sedan","Hatchback","SUV","Pickup","Coupe","Van"])}`,
     price: randomInt(1200, 6000),
     carDetails: {
+      carType: `${pick(["Luxury", "Sedan", "Van", "SUV", "Hatchback", "Sports"])}` ,
       seats: randomInt(2, 8),
       transmission: pick(["Automatic", "Manual"]),
       fuelType: pick(["Gasoline", "Diesel", "Electric", "Hybrid"]),

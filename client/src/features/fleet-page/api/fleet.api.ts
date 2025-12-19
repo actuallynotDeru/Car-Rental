@@ -44,9 +44,13 @@ export const FleetAPI = {
     try {
       const formData = new FormData();
       
+      console.log("Creating car with data:", carData);
+      console.log("carType value:", carData.carDetails.carType);
+      
       formData.append("ownerId", carData.ownerId);
       formData.append("name", carData.name);
       formData.append("price", carData.price.toString());
+      formData.append("carType", carData.carDetails.carType || "Sedan");
       formData.append("seats", carData.carDetails.seats.toString());
       formData.append("transmission", carData.carDetails.transmission);
       formData.append("fuelType", carData.carDetails.fuelType);
@@ -83,6 +87,7 @@ export const FleetAPI = {
       if (carData.name) formData.append("name", carData.name);
       if (carData.price !== undefined) formData.append("price", carData.price.toString());
       if (carData.carDetails) {
+        formData.append("carType", carData.carDetails.carType);
         formData.append("seats", carData.carDetails.seats.toString());
         formData.append("transmission", carData.carDetails.transmission);
         formData.append("fuelType", carData.carDetails.fuelType);

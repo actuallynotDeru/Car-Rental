@@ -161,22 +161,22 @@ const MainPage = () => {
         <motion.div variants={MainAnimations.stepsContainer} initial = "hidden" whileInView = "visible" className="w-[1100px] h-[250px] flex justify-between">
           <motion.div variants={MainAnimations.stepCard} initial = "hidden" whileInView = "visible" whileHover={MainAnimations.stepCardHover.hover} className="w-[250px] h-[230px] bg-[#FFFFFF] rounded-[16px] shadow-lg flex flex-col justify-center items-center">
             <Search color="#1591EA" size={60}/> <p className="text-2xl font-semibold">Browse & Select</p>
-            <p className="w-[200px] text-center"> Lorem Ipsum DOLOR LALALALALALLALALALAL</p>
+            <p className="w-[200px] text-center"> Explore our available vehicles and choose the one that fits your needs and budget.</p>
           </motion.div>
           
           <motion.div variants={MainAnimations.stepCard} initial = "hidden" whileInView = "visible" whileHover={MainAnimations.stepCardHover.hover} className="w-[250px] h-[230px] bg-[#FFFFFF] rounded-[16px] shadow-lg flex flex-col justify-center items-center">
-            <Calendar color="#1591EA" size={60}/> <p className="text-2xl font-semibold">Pick Your Dates</p>
-            <p className="w-[200px] text-center"> Lorem Ipsum DOLOR LALALALALALLALALALAL</p>
+            <Calendar color="#1591EA" size={60}/> <p className="text-2xl font-semibold text-center">Pick Your Dates</p>
+            <p className="w-[200px] text-center">Select your pickup and return dates to see real-time availability.</p>
           </motion.div>
             
           <motion.div variants={MainAnimations.stepCard} initial = "hidden" whileInView = "visible" whileHover={MainAnimations.stepCardHover.hover} className="w-[250px] h-[230px] bg-[#FFFFFF] rounded-[16px] shadow-lg flex flex-col justify-center items-center">
             <CircleCheckBig color="#1591EA" size={60}/> <p className="text-2xl font-semibold">Book & Pay</p>
-            <p className="w-[200px] text-center"> Lorem Ipsum DOLOR LALALALALALLALALALAL</p>
+            <p className="w-[200px] text-center">Once your booking is confirmed, complete payment securely in just a few steps.</p>
           </motion.div>
           
           <motion.div variants={MainAnimations.stepCard} initial = "hidden" whileInView = "visible" whileHover={MainAnimations.stepCardHover.hover} className="w-[250px] h-[230px] bg-[#FFFFFF] rounded-[16px] shadow-lg flex flex-col justify-center items-center">
-            <Key color="#1591EA" size={60}/> <p className="text-2xl font-semibold">Book & Pay</p>
-            <p className="w-[200px] text-center"> Lorem Ipsum DOLOR LALALALALALLALALALAL</p>
+            <Key color="#1591EA" size={60}/> <p className="text-2xl font-semibold">Pick Up & Drive</p>
+            <p className="w-[200px] text-center">Collect your car on your chosen date and enjoy a smooth, hassle-free ride.</p>
           </motion.div>
         </motion.div>
     </div>
@@ -212,7 +212,7 @@ const MainPage = () => {
                     daily drive, we've got the ride for you.</p>
             </div>
             <button 
-              onClick={() => navigate('/application/form')}
+              onClick={() => navigate(!user ? '/login' : user.role === "Customer" ? '/application/form' : user.role === "CarOwner" ? `fleet/${user._id}` : '')}
               className="bg-[#1591EA] mt-5 text-white h-[35px] w-[120px] flex items-center justify-center gap-5 rounded-[8px] hover:bg-[#1280D1] transition-colors">
                 List Your Car
             </button>
@@ -247,16 +247,16 @@ const MainPage = () => {
         </motion.p>
         <div className="flex gap-7">
             <ReviewCard
-                message="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-                name="Jane Doe"
+                message="Booking was quick and hassle-free. The car was clean, well-maintained, and exactly what was shown on the website. I’ll definitely use this service again."
+                name="Jane D."
             />
             <ReviewCard
-                message="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-                name="Jane Doe"
+                message="Customer support was very responsive and helpful. They answered all my questions and made sure everything went smoothly during my trip."
+                name="Mark R."
             />
             <ReviewCard
-                message="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-                name="Jane Doe"
+                message="Great experience overall. The pickup process was simple, and the vehicle performed perfectly throughout my rental period."
+                name="Alyssa C."
             />
         </div>
     </motion.div>

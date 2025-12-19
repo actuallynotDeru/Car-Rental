@@ -14,6 +14,7 @@ export interface Car {
   name: string
   price: number
   carDetails: {
+    carType: string
     seats: number
     transmission: string
     fuelType: string
@@ -27,6 +28,7 @@ export interface Car {
 export interface CarFormData {
   name: string
   price: string
+  carType: string
   seats: string
   transmission: string
   fuelType: string
@@ -41,6 +43,7 @@ export interface CreateCarRequest {
   name: string
   price: number
   carDetails: {
+    carType: string
     seats: number
     transmission: string
     fuelType: string
@@ -55,6 +58,7 @@ export interface UpdateCarRequest {
   name?: string
   price?: number
   carDetails?: {
+    carType: string
     seats: number
     transmission: string
     fuelType: string

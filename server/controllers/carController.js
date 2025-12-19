@@ -52,6 +52,7 @@ export const createCar = async (req, res) => {
           ownerId,
           name,
           price,
+          carType,
           seats,
           transmission,
           fuelType,
@@ -62,7 +63,10 @@ export const createCar = async (req, res) => {
           location
       } = req.body;
 
-      // Validate required fields
+      console.log('Received car data:', req.body);
+      console.log('carType received:', carType);
+
+      // Validate required fields (carType has a default so not strictly required from client)
       if (!ownerId || !name || !price || !seats || !transmission || !fuelType || !plateNumber) {
           return res.status(400).json({ message: 'All required fields must be provided' });
       }
@@ -80,6 +84,7 @@ export const createCar = async (req, res) => {
           name,
           price: Number(price),
           carDetails: {
+              carType: carType || 'Sedan',
               seats: Number(seats),
               transmission,
               fuelType,
@@ -114,6 +119,7 @@ export const updateCar = async (req, res) => {
       const {
           name,
           price,
+          carType,
           seats,
           transmission,
           fuelType,
@@ -133,8 +139,9 @@ export const updateCar = async (req, res) => {
       if (location !== undefined) updateData.location = location;
 
       // Handle carDetails
-      if (seats || transmission || fuelType || plateNumber) {
+      if (carType || seats || transmission || fuelType || plateNumber) {
           updateData.carDetails = {
+              carType: carType || existingCar.carDetails.carType,
               seats: seats ? Number(seats) : existingCar.carDetails.seats,
               transmission: transmission || existingCar.carDetails.transmission,
               fuelType: fuelType || existingCar.carDetails.fuelType,
@@ -193,6 +200,44 @@ export const deleteCar = async (req, res) => {
       
       res.json({ message: "Car deleted successfully" });
   } catch (err) {
+      res.status(500).json({ message: err.message });
+  }
+};
+
+// Rate a car (simple average calculation)
+export const rateCar = async (req, res) => {
+  try {
+      const { rating } = req.body;
+      
+      // Validate rating
+      if (rating === undefined || rating < 0 || rating > 5) {
+          return res.status(400).json({ message: "Rating must be between 0 and 5" });
+      }
+
+      const car = await Car.findById(req.params.id);
+      
+      if (!car) {
+          return res.status(404).json({ message: "Car not found" });
+      }
+
+      // Calculate new average rating
+      // For simplicity, we'll use a weighted average where new rating has some impact
+      // In a real app, you'd want to store individual ratings and calculate the true average
+      const currentRating = car.rating || 5.0;
+      const newRating = (currentRating * 0.8) + (Number(rating) * 0.2);
+      
+      // Clamp the rating between 0 and 5
+      const clampedRating = Math.min(5, Math.max(0, newRating));
+
+      const updatedCar = await Car.findByIdAndUpdate(
+          req.params.id,
+          { rating: Number(clampedRating.toFixed(1)) },
+          { new: true, runValidators: true }
+      ).populate('ownerId', 'fullName email');
+
+      res.json(updatedCar);
+  } catch (err) {
+      console.error('Error rating car:', err);
       res.status(500).json({ message: err.message });
   }
 };

@@ -46,6 +46,7 @@ export default function FleetPage() {
   const [formData, setFormData] = useState<CarFormData>({
     name: "",
     price: "",
+    carType: "Sedan",
     seats: "",
     transmission: "Automatic",
     fuelType: "Gasoline",
@@ -187,6 +188,7 @@ export default function FleetPage() {
     setFormData({
       name: "",
       price: "",
+      carType: "Sedan",
       seats: "",
       transmission: "Automatic",
       fuelType: "Gasoline",
@@ -208,6 +210,7 @@ export default function FleetPage() {
     setFormData({
       name: car.name,
       price: car.price.toString(),
+      carType: car.carDetails.carType || "Sedan",
       seats: car.carDetails.seats.toString(),
       transmission: car.carDetails.transmission,
       fuelType: car.carDetails.fuelType,
@@ -247,6 +250,7 @@ export default function FleetPage() {
           name: formData.name,
           price: Number(formData.price),
           carDetails: {
+            carType: formData.carType,
             seats: Number(formData.seats),
             transmission: formData.transmission,
             fuelType: formData.fuelType,
@@ -266,11 +270,16 @@ export default function FleetPage() {
           setFormErrors({ submit: 'Owner ID is required' })
           return
         }
+        
+        console.log("Form data before create:", formData);
+        console.log("carType from formData:", formData.carType);
+        
         const createData = {
           ownerId: currentOwnerId,
           name: formData.name,
           price: Number(formData.price),
           carDetails: {
+            carType: formData.carType || "Sedan",
             seats: Number(formData.seats),
             transmission: formData.transmission,
             fuelType: formData.fuelType,
@@ -280,6 +289,9 @@ export default function FleetPage() {
           image: formData.image!,
           status: formData.status,
         }
+        
+        console.log("Create data being sent:", createData);
+        
         const newCar = await FleetAPI.createCar(createData)
         setOwnerCars((prev) => [...prev, newCar])
         setAddDialogOpen(false)
