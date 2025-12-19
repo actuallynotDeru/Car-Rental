@@ -2,6 +2,9 @@ import { Star, Users, Settings, Fuel, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
 import type { Car } from "../types/product.types" // Adjust path to where your types are defined
+import { motion } from "framer-motion"
+import { RentalAnimations } from "../animations/rental.animations"
+import { SERVER_BASE_URL } from "@/config/serverURL"
 
 interface RentalCardProps {
   car: Car
@@ -21,18 +24,19 @@ const RentalCard = ({ car }: RentalCardProps) => {
   } = car
 
   return (
-    <div className="group relative bg-card rounded-2xl overflow-hidden border border-border hover:border-foreground/20 transition-all duration-300 hover:shadow-lg">
+    <motion.div variants={RentalAnimations.carCard} initial = "hidden" animate = "visible" whileHover = {RentalAnimations.carCardHover.hover} className="group relative bg-card rounded-2xl overflow-hidden border border-border hover:border-foreground/20 transition-all duration-300 hover:shadow-lg">
       {/* Image Container */}
       <div className="relative h-48 bg-muted overflow-hidden">
-        <img
-          src={image || "/placeholder.svg"}
+        <motion.img
+          variants={RentalAnimations.carImage} initial = "rest" whileHover = {RentalAnimations.carImage.hover}
+          src={`${SERVER_BASE_URL}${image}`}
           alt={name}
           className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
         />
         {/* Badge - Using Fuel Type as the badge */}
-        <div className="absolute top-4 left-4 bg-blue-400 text-background text-xs font-medium px-3 py-1 rounded-full">
+        <motion.div variants={RentalAnimations.badge} initial = "hidden" animate = "visible" className="absolute top-4 left-4 bg-blue-400 text-background text-xs font-medium px-3 py-1 rounded-full">
           {carDetails.fuelType}
-        </div>
+        </motion.div>
       </div>
 
       {/* Content */}
@@ -83,7 +87,7 @@ const RentalCard = ({ car }: RentalCardProps) => {
           </Button>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 

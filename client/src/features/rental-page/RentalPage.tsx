@@ -5,6 +5,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Calendar, Search, SlidersHorizontal, ChevronDown, Loader2 } from "lucide-react"
+import { motion } from "framer-motion"
+import { RentalAnimations } from "./animations/rental.animations"
 
 // Date handling imports
 import { format } from "date-fns"
@@ -110,23 +112,23 @@ export default function RentalPage() {
   }, [cars, bookings, dateRange]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <motion.div variants={RentalAnimations.container} initial = "hidden" animate = "visible" className="min-h-screen bg-background">
       <Header />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
+      <motion.section variants={RentalAnimations.heroSection} initial = "hidden" animate = "visible" className="relative overflow-hidden">
         <div className="container mx-auto px-6 py-16 md:py-24">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight text-balance">
+            <motion.h1 variants={RentalAnimations.heroTitle} initial = "hidden" animate = "visible" className="text-4xl md:text-6xl font-bold text-foreground tracking-tight text-balance">
               Find Your Perfect Ride
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
+            </motion.h1>
+            <motion.p variants={RentalAnimations.heroDescription} initial = "hidden" animate = "visible" className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
               Browse our premium fleet and discover the ideal vehicle for your journey. Transparent pricing, no hidden
               fees.
-            </p>
+            </motion.p>
 
             {/* Search Bar */}
-            <div className="mt-10 bg-card border border-border rounded-2xl p-2 shadow-sm max-w-2xl mx-auto">
+            <motion.div variants={RentalAnimations.searchBar} initial = "hidden" animate = "visible" className="mt-10 bg-card border border-border rounded-2xl p-2 shadow-sm max-w-2xl mx-auto">
               <div className="flex flex-col sm:flex-row gap-2 justify-center">
                 
                 <div className="flex-1">
@@ -156,16 +158,16 @@ export default function RentalPage() {
                   Search
                 </Button>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Main Content */}
-      <section className="container mx-auto px-6 pb-16">
+      <motion.section variants={RentalAnimations.mainContent} initial = "hidden" animate = "visible" className="container mx-auto px-6 pb-16">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar */}
-          <aside className="w-full lg:w-72 shrink-0 space-y-6">
+          <motion.aside variants={RentalAnimations.sidebar} initial = "hidden" animate = "visible" className="w-full lg:w-72 shrink-0 space-y-6">
             {/* Categories */}
             <div className="bg-card border border-border rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-foreground mb-4">Categories</h2>
@@ -230,12 +232,12 @@ export default function RentalPage() {
                 </div>
               </div>
             </div>
-          </aside>
+          </motion.aside>
 
           {/* Fleet Grid */}
           <div className="flex-1">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <motion.div variants={RentalAnimations.fleetHeader} initial = "hidden" animate = "visible" className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
               <div>
                 <h2 className="text-2xl font-bold text-foreground">Our Fleet</h2>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -246,7 +248,7 @@ export default function RentalPage() {
                    }
                 </p>
               </div>
-              <div className="flex items-center gap-3">
+              <motion.div variants={RentalAnimations.searchFilterBar} initial = "hidden" animate = "visible" className="flex items-center gap-3">
                 <div className="relative flex-1 sm:w-64">
                   <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input placeholder="Search vehicles..." className="pl-10 bg-card border-border rounded-xl" />
@@ -254,8 +256,8 @@ export default function RentalPage() {
                 <Button variant="outline" size="icon" className="rounded-xl shrink-0 bg-transparent">
                   <SlidersHorizontal size={18} />
                 </Button>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             {/* Grid */}
             {loading ? (
@@ -263,7 +265,7 @@ export default function RentalPage() {
                   <Loader2 className="animate-spin text-blue-400" size={48} />
                </div>
             ) : (
-              <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                <motion.div variants={RentalAnimations.carsGrid} initial = "hidden" animate = "visible" className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {/* Check if availableCars has items, otherwise show "No cars" message */}
                 {availableCars.length > 0 ? (
                   availableCars.map((car) => (
@@ -284,7 +286,7 @@ export default function RentalPage() {
                     </Button>
                   </div>
                 )}
-              </div>
+              </motion.div>
             )}
             
             {/* Load More - Only show if we have results */}
@@ -297,7 +299,7 @@ export default function RentalPage() {
             )}
           </div>
         </div>
-      </section>
-    </div>
+      </motion.section>
+    </motion.div>
   )
 }

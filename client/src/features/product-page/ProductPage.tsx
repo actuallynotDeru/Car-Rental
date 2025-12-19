@@ -1,11 +1,13 @@
 import Header from "@/components/Header";
-import CustomerReview from "./components/CustomerReview";
 import DateRangeModal  from "./components/bookingcalendar"; // Ensure this path matches your file structure
-import { MapPin, Star, Users, Settings, Fuel, MoveLeft, MoveRight, Loader2 } from "lucide-react";
+import { MapPin, Users, Settings, Fuel, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { format } from "date-fns";
 import type { DateRange } from "react-day-picker";
+import { motion } from "framer-motion";
+import { ProductAnimations } from "./animations/product.animations";
+
 
 // API Imports
 import { getCarById } from "./api/product.api";
@@ -14,6 +16,7 @@ import { getBookings } from "./api/booking.api";
 
 // Type Imports
 import type { Car, Owner } from "./types/product.types";
+import { SERVER_BASE_URL } from "@/config/serverURL";
 
 const ProductPage = () => {
   // 1. Get URL Parameters
@@ -101,9 +104,9 @@ const ProductPage = () => {
   // 6. Loading State
   if (loading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center">
+      <motion.div variants={ProductAnimations.loading} initial = "hidden" animate = "visible" className="flex h-screen w-full items-center justify-center">
         <Loader2 className="animate-spin text-blue-500" size={48} />
-      </div>
+      </motion.div>
     );
   }
 
@@ -117,31 +120,31 @@ const ProductPage = () => {
   }
 
   return (
-    <>
+    <motion.div variants={ProductAnimations.container} initial = "hidden" animate = "visible">
       <Header />
 
       {/* Hero Image / Carousel Placeholder */}
-      <div className="w-full h-[480px] bg-gray-200 flex items-center justify-center overflow-hidden">
+      <motion.div variants={ProductAnimations.carousel} initial = "hidden" animate = "visible" className="w-full h-[480px] bg-gray-200 flex items-center justify-center overflow-hidden">
         {car.image ? (
-            <img src={car.image} alt={car.name} className="w-full h-full object-cover" />
+            <img src={`${SERVER_BASE_URL}${car.image}`} alt={car.name} className="w-full h-full object-cover" />
         ) : (
             <p className="text-gray-500 text-lg">[No Image Available]</p>
         )}
-      </div>
+      </motion.div>
 
       {/* Main Content Area */}
-      <div className="bg-[#F2F2F2] py-12 flex justify-center">
+      <motion.div variants={ProductAnimations.mainContent} initial = "hidden" animate = "visible" className="bg-[#F2F2F2] py-12 flex justify-center">
         <div className="flex w-full max-w-6xl gap-10 px-6 flex-col lg:flex-row">
           
           {/* Left Column: Product Details */}
           <div className="flex-1 flex flex-col gap-8">
             {/* Title */}
-            <div>
+            <motion.div variants={ProductAnimations.carTitle} initial = "hidden" animate = "visible">
               <h1 className="text-4xl font-semibold text-gray-900">{car.name}</h1>
-            </div>
+            </motion.div>
 
             {/* Specs & Location */}
-            <div className="flex justify-between items-center flex-wrap gap-4">
+            <motion.div variants={ProductAnimations.specsRow} initial = "hidden" animate = "visible" className="flex justify-between items-center flex-wrap gap-4">
               <div className="flex items-center gap-2 text-gray-600">
                 <MapPin size={18} />
                 <p>Location, Location, Location</p> 
@@ -157,10 +160,10 @@ const ProductPage = () => {
                   <Fuel size={18} /> <span>{car.carDetails.fuelType}</span>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Owner Info */}
-            <div>
+            <motion.div variants={ProductAnimations.hostSection} initial = "hidden" animate = "visible">
               <h2 className="text-2xl font-semibold text-gray-900">Hosted By</h2>
               <div className="flex items-center gap-4 mt-3">
                 <div className="w-[70px] h-[70px] rounded-full bg-gray-300 flex items-center justify-center text-xl font-bold text-gray-500">
@@ -168,19 +171,19 @@ const ProductPage = () => {
                 </div>
                 <span className="text-lg font-medium text-gray-800">{owner?.fullName || "Unknown Owner"}</span>
               </div>
-            </div>
+            </motion.div>
 
             {/* Description */}
-            <div>
+            <motion.div variants={ProductAnimations.description} initial = "hidden" animate = "visible">
               <h2 className="text-2xl font-semibold text-gray-900">Description</h2>
               <p className="text-gray-600 leading-relaxed mt-2">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempora voluptatibus itaque enim provident, eum architecto adipisci impedit dolorum.
               </p>
-            </div>
+            </motion.div>
           </div>
 
           {/* Right Column: Sticky Rent Card */}
-          <div className="w-full lg:w-[320px] flex-shrink-0">
+          <motion.div variants={ProductAnimations.bookingCard} initial = "hidden" animate = "visible" className="w-full lg:w-[320px] flex-shrink-0">
             <div className="bg-white rounded-2xl shadow-md p-5 flex flex-col gap-4 border border-gray-100 sticky top-4">
               
               {/* Price Header */}
@@ -228,46 +231,11 @@ const ProductPage = () => {
                 Rent Now
               </button>
             </div>
-          </div>
+          </motion.div>
 
         </div>
-      </div>
-
-      {/* Reviews Section */}
-      <div className="bg-[#F2F2F2] py-12 flex justify-center border-t border-gray-200">
-        <div className="w-full max-w-6xl px-6 flex flex-col gap-8">
-          <div className="flex justify-between items-center flex-wrap gap-4">
-            <p className="font-semibold text-3xl text-gray-900">Reviews (12)</p>
-            <div className="flex items-center gap-2">
-              <p className="text-lg font-medium text-gray-800">{car.rating || 4.5}</p>
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="fill-yellow-400 text-yellow-400" size={22} />
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-6">
-            <CustomerReview />
-            <CustomerReview />
-            <CustomerReview />
-          </div>
-
-          {/* Pagination */}
-          <div className="flex justify-center items-center gap-3 mt-6">
-            <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100">
-              <MoveLeft size={16} />
-            </button>
-            <div className="flex items-center gap-2">
-              <button className="px-3 py-2 bg-amber-500 text-white rounded-lg">1</button>
-              <button className="px-3 py-2 bg-white border border-gray-300 text-gray-600 hover:bg-gray-100">2</button>
-            </div>
-            <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100">
-              <MoveRight size={16} />
-            </button>
-          </div>
-        </div>
-      </div>
-    </>
+      </motion.div>
+    </motion.div>
   );
 };
 

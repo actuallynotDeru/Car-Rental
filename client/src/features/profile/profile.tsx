@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import ProfileContainer from "./components/profile-container";
-import LastViewed from "./components/LastViewed-Container";
 import PreviouslyBooked from "./components/PreviouslyBooked-Container";
 import { motion } from "framer-motion";
 import { ProfileAnimations } from "./animations/profile.animations";
@@ -53,7 +52,6 @@ const ProfilePage = () => {
                 isPhoneVerified={false}/>
 
             <div className="w-full flex flex-col mr-10">
-                <LastViewed />
                 <PreviouslyBooked />
             </div>
 
