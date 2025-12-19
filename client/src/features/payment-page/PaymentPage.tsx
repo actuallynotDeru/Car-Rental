@@ -1,28 +1,41 @@
+import { useLocation, Navigate } from "react-router-dom";
 import Header from "@/components/Header"
 import OrderDetails from "./components/OrderDetails"
 import OrderSummary from "./components/OrderSummary"
 
-interface PaymentFormsProps{
-    ProductName: string
-    ProductPrice: number
-}
+const PaymentForms = () => {
+    const location = useLocation();
+    const orderData = location.state;
 
-const PaymentForms = ()  => {
+    // Safety: Redirect if user jumps here without renting
+    if (!orderData) {
+        return <Navigate to="/" replace />;
+    }
+
+    // Calculate Final Total to pass to the Pay Button
+    const finalTotal = orderData.totalPrice + orderData.serviceFee + orderData.tax;
+
     return(
         <>
             <Header />
             <div className="w-full flex flex-row justify-center align-middle pt-5">
 
-                {/* Contact and Card Container */}
+                {/* Left: Contact and Card Container */}
                 <div className="w-2xl">
                     <p className="font-semibold text-4xl">Complete Your Order</p>
-                    <p className="pb-2">Secure checkout powered by industry-standard encryption</p>
-                    <OrderDetails itemPrice = {1200}/>
+                    <p className="pb-2 text-gray-500">Secure checkout powered by industry-standard encryption</p>
+                    
+                    {/* --- UPDATED: Pass the correct props --- */}
+                    <OrderDetails 
+                        totalPrice={finalTotal} 
+                        orderData={orderData} 
+                    />
+                    {/* -------------------------------------- */}
                 </div>
 
-                {/* item summary */}
-                <div className="w-l flex flex-col justify-center pl-10 ">
-                    <OrderSummary />
+                {/* Right: Item summary */}
+                <div className="w-l flex flex-col pl-10">
+                    <OrderSummary data={orderData} />
                 </div>
             
             </div>
