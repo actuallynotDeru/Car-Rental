@@ -57,6 +57,22 @@ const EditModal = ({
             />
             {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
           </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Car Type</label>
+            <select
+              name="carType"
+              value={formData.carType}
+              onChange={onInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="Sedan">Sedan</option>
+              <option value="SUV">SUV</option>
+              <option value="Hatchback">Hatchback</option>
+              <option value="Van">Van</option>
+              <option value="Luxury">Luxury</option>
+              <option value="Sports">Sports</option>
+            </select>
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Price per Day ($)</label>

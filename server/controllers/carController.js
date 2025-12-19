@@ -52,6 +52,7 @@ export const createCar = async (req, res) => {
           ownerId,
           name,
           price,
+          carType,
           seats,
           transmission,
           fuelType,
@@ -62,7 +63,10 @@ export const createCar = async (req, res) => {
           location
       } = req.body;
 
-      // Validate required fields
+      console.log('Received car data:', req.body);
+      console.log('carType received:', carType);
+
+      // Validate required fields (carType has a default so not strictly required from client)
       if (!ownerId || !name || !price || !seats || !transmission || !fuelType || !plateNumber) {
           return res.status(400).json({ message: 'All required fields must be provided' });
       }
@@ -80,6 +84,7 @@ export const createCar = async (req, res) => {
           name,
           price: Number(price),
           carDetails: {
+              carType: carType || 'Sedan',
               seats: Number(seats),
               transmission,
               fuelType,
@@ -114,6 +119,7 @@ export const updateCar = async (req, res) => {
       const {
           name,
           price,
+          carType,
           seats,
           transmission,
           fuelType,
@@ -133,8 +139,9 @@ export const updateCar = async (req, res) => {
       if (location !== undefined) updateData.location = location;
 
       // Handle carDetails
-      if (seats || transmission || fuelType || plateNumber) {
+      if (carType || seats || transmission || fuelType || plateNumber) {
           updateData.carDetails = {
+              carType: carType || existingCar.carDetails.carType,
               seats: seats ? Number(seats) : existingCar.carDetails.seats,
               transmission: transmission || existingCar.carDetails.transmission,
               fuelType: fuelType || existingCar.carDetails.fuelType,
