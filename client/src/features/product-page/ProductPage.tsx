@@ -192,6 +192,49 @@ const ProductPage = () => {
               <h1 className="text-4xl font-semibold text-gray-900">{car.name}</h1>
             </motion.div>
 
+            {/* Rating Section */}
+            <motion.div 
+              variants={ProductAnimations.specsRow} 
+              initial="hidden" 
+              animate="visible" 
+              className="flex flex-col gap-3"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1">
+                  <Star className="text-yellow-400 fill-yellow-400" size={20} />
+                  <span className="text-lg font-semibold text-gray-900">{car.rating?.toFixed(1) || "5.0"}</span>
+                </div>
+                <span className="text-gray-400">|</span>
+                <span className="text-gray-600">Rate this car:</span>
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      onClick={() => handleRate(star)}
+                      disabled={isRating}
+                      className={`transition-all duration-150 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed ${
+                        star <= userRating ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-300'
+                      }`}
+                      title={`Rate ${star} star${star > 1 ? 's' : ''}`}
+                    >
+                      <Star 
+                        size={22} 
+                        className={star <= userRating ? 'fill-yellow-400' : 'fill-transparent'} 
+                      />
+                    </button>
+                  ))}
+                </div>
+                {isRating && (
+                  <Loader2 className="animate-spin text-blue-500" size={18} />
+                )}
+              </div>
+              {ratingMessage && (
+                <span className={`text-sm ${ratingMessage.includes('Failed') ? 'text-red-500' : 'text-green-600'}`}>
+                  {ratingMessage}
+                </span>
+              )}
+            </motion.div>
+
             {/* Specs & Location */}
             <motion.div variants={ProductAnimations.specsRow} initial = "hidden" animate = "visible" className="flex justify-between items-center flex-wrap gap-4">
               <div className="flex items-center gap-2 text-gray-600">
