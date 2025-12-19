@@ -57,6 +57,8 @@ export const FleetAPI = {
       formData.append("plateNumber", carData.carDetails.plateNumber);
       formData.append("status", carData.status);
       formData.append("rating", (carData.rating || 5.0).toString());
+      if (carData.description) formData.append("description", carData.description);
+      if (carData.location) formData.append("location", carData.location);
       
       if (carData.image) {
         formData.append("images", carData.image);
@@ -94,6 +96,8 @@ export const FleetAPI = {
         formData.append("plateNumber", carData.carDetails.plateNumber);
       }
       if (carData.status) formData.append("status", carData.status);
+      if (carData.description !== undefined) formData.append("description", carData.description);
+      if (carData.location !== undefined) formData.append("location", carData.location);
       
       if (carData.image) {
         formData.append("images", carData.image);

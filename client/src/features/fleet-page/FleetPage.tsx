@@ -54,6 +54,8 @@ export default function FleetPage() {
     image: null,
     imagePreview: "",
     status: "Available",
+    description: "",
+    location: "",
   })
   
   useEffect(() => {
@@ -196,6 +198,8 @@ export default function FleetPage() {
       image: null,
       imagePreview: "",
       status: "Available",
+      description: "",
+      location: "",
     })
     setFormErrors({})
     setEditingCar(null)
@@ -218,6 +222,8 @@ export default function FleetPage() {
       image: null, // No new file selected yet
       imagePreview: imageUrl, // Show existing image
       status: car.status,
+      description: car.description || "",
+      location: car.location || "",
     })
     setFormErrors({})
     setEditDialogOpen(true)
@@ -257,6 +263,8 @@ export default function FleetPage() {
             plateNumber: formData.plateNumber,
           },
           status: formData.status,
+          description: formData.description,
+          location: formData.location,
           ...(formData.image && { image: formData.image }),
         }
         const updated = await FleetAPI.updateCar(editingCar._id!, updateData)
@@ -288,6 +296,8 @@ export default function FleetPage() {
           rating: 5.0,
           image: formData.image!,
           status: formData.status,
+          description: formData.description,
+          location: formData.location,
         }
         
         console.log("Create data being sent:", createData);

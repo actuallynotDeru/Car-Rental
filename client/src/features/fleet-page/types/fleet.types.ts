@@ -23,6 +23,8 @@ export interface Car {
   rating: number
   image: string
   status: string
+  description?: string
+  location?: string
 }
 
 export interface CarFormData {
@@ -36,6 +38,8 @@ export interface CarFormData {
   image: File | null
   imagePreview: string
   status: string
+  description: string
+  location: string
 }
 
 export interface CreateCarRequest {
@@ -52,6 +56,8 @@ export interface CreateCarRequest {
   rating?: number
   image: File
   status: string
+  description?: string
+  location?: string
 }
 
 export interface UpdateCarRequest {
@@ -66,4 +72,6 @@ export interface UpdateCarRequest {
   }
   image?: File
   status?: string
+  description?: string
+  location?: string
 }

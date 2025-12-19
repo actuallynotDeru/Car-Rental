@@ -192,6 +192,30 @@ const EditModal = ({
             )}
             {errors.image && <p className="mt-1 text-sm text-red-600">{errors.image}</p>}
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={(e) => onInputChange(e as unknown as React.ChangeEvent<HTMLInputElement>)}
+              placeholder="Enter a brief description of the vehicle..."
+              rows={3}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Location</label>
+            <input
+              type="text"
+              name="location"
+              value={formData.location}
+              onChange={onInputChange}
+              placeholder="e.g., Downtown, Airport, etc."
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
           
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
