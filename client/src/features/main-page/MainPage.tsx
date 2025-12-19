@@ -212,7 +212,7 @@ const MainPage = () => {
                     daily drive, we've got the ride for you.</p>
             </div>
             <button 
-              onClick={() => navigate('/application/form')}
+              onClick={() => navigate(!user ? '/login' : user.role === "Customer" ? '/application/form' : user.role === "CarOwner" ? `fleet/${user._id}` : '')}
               className="bg-[#1591EA] mt-5 text-white h-[35px] w-[120px] flex items-center justify-center gap-5 rounded-[8px] hover:bg-[#1280D1] transition-colors">
                 List Your Car
             </button>

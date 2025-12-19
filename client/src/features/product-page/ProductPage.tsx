@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import DateRangeModal  from "./components/bookingcalendar"; // Ensure this path matches your file structure
+import StarRating from "./components/star-rating";
 import { MapPin, Users, Settings, Fuel, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -10,7 +11,7 @@ import { ProductAnimations } from "./animations/product.animations";
 
 
 // API Imports
-import { getCarById } from "./api/product.api";
+import { getCarById, rateCar } from "./api/product.api";
 import { getOwnerById } from "./api/owner.api";
 import { getBookings } from "./api/booking.api"; 
 
@@ -32,6 +33,33 @@ const ProductPage = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   // State for dates that are ALREADY booked (to disable them)
   const [bookedRanges, setBookedRanges] = useState<DateRange[]>([]);
+  // State for user rating
+  const [userRating, setUserRating] = useState<number>(0);
+  const [isRating, setIsRating] = useState<boolean>(false);
+  const [ratingMessage, setRatingMessage] = useState<string>("");
+
+  // Handle rating submission
+  const handleRate = async (rating: number) => {
+    if (!carId || isRating) return;
+    
+    setIsRating(true);
+    setRatingMessage("");
+    
+    try {
+      const updatedCar = await rateCar(carId, rating);
+      setCar(updatedCar);
+      setUserRating(rating);
+      setRatingMessage("Thanks for rating!");
+      
+      // Clear message after 3 seconds
+      setTimeout(() => setRatingMessage(""), 3000);
+    } catch (err) {
+      console.error("Error rating car:", err);
+      setRatingMessage("Failed to submit rating");
+    } finally {
+      setIsRating(false);
+    }
+  };
 
   // 3. Fetch Data
  useEffect(() => {
@@ -179,6 +207,48 @@ const ProductPage = () => {
               <p className="text-gray-600 leading-relaxed mt-2">
                 {car.description}
               </p>
+            </motion.div>
+
+            {/* Rating Section */}
+            <motion.div 
+              variants={ProductAnimations.description} 
+              initial="hidden" 
+              animate="visible" 
+              className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+            >
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Rating</h2>
+              
+              {/* Current Average Rating */}
+              <div className="flex items-center gap-4 mb-6">
+                <div className="text-4xl font-bold text-gray-900">{car.rating.toFixed(1)}</div>
+                <div>
+                  <StarRating rating={car.rating} readonly size={24} showValue={false} />
+                  <p className="text-sm text-gray-500 mt-1">Average rating</p>
+                </div>
+              </div>
+
+              {/* Rate This Car */}
+              <div className="border-t border-gray-100 pt-4">
+                <h3 className="text-lg font-medium text-gray-800 mb-3">Rate this car</h3>
+                <div className="flex items-center gap-4">
+                  <StarRating 
+                    rating={userRating} 
+                    onRate={handleRate} 
+                    readonly={isRating}
+                    size={28}
+                    showValue={false}
+                  />
+                  {isRating && (
+                    <Loader2 className="animate-spin text-blue-500" size={20} />
+                  )}
+                  {ratingMessage && (
+                    <span className={`text-sm ${ratingMessage.includes('Failed') ? 'text-red-500' : 'text-green-500'}`}>
+                      {ratingMessage}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400 mt-2">Click on a star to rate</p>
+              </div>
             </motion.div>
           </div>
 
