@@ -43,8 +43,14 @@ const RentalCard = ({ car }: RentalCardProps) => {
       <div className="p-5 space-y-4">
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
-          <div>
-            <h3 className="text-lg font-semibold text-foreground leading-tight">{name}</h3>
+          <div className = "w-full">
+            <div className = "flex justify-between">
+              <h3 className="text-lg font-semibold text-foreground leading-tight">{name}</h3>
+              
+              <div className = "px-3 py-1 text-xs bg-slate-950 text-white rounded-full">
+                <p>{ carDetails.carType }</p>
+              </div>
+            </div>
             <div className="flex items-center gap-1.5 mt-1">
               <Star size={14} className="text-foreground fill-foreground" />
               <span className="text-sm font-medium text-foreground">{rating}</span>

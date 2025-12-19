@@ -4,6 +4,7 @@ import { MapPin, Check, X, ArrowLeft } from 'lucide-react'
 import { motion } from 'framer-motion';
 import { ProfileAnimations } from '../animations/profile.animations';
 import { Button } from '@/components/ui/button';
+import { SERVER_BASE_URL } from '@/config/serverURL';
 
 interface ProfileProps {
         name: string;
@@ -12,6 +13,7 @@ interface ProfileProps {
         isIdentityVerified?: boolean;
         isEmailVerified?: boolean;
         isPhoneVerified?: boolean;
+        selfiePhoto?: string | null;
 }
 
 const MotionButton = motion.create(Button);
@@ -22,9 +24,14 @@ const ProfileContainer: React.FC<ProfileProps> = ({
     joined,
     isIdentityVerified = false,
     isEmailVerified = false,
-    isPhoneVerified = false
+    isPhoneVerified = false,
+    selfiePhoto = null
 }) => {
   const navigate = useNavigate();
+
+  const profileImageUrl = selfiePhoto 
+    ? `${SERVER_BASE_URL}${selfiePhoto}` 
+    : null;
   
     return(
       <>
@@ -46,7 +53,19 @@ const ProfileContainer: React.FC<ProfileProps> = ({
             {/* profile deets */}
             <motion.div variants = {ProfileAnimations.profileDetails} initial = "hidden" animate = "visible">
                 <p className="text-2xl font-bold">My Profile</p>
-                <div className="w-32 h-32 rounded-full bg-gray-300 mb-4 mt-3 ml-4"></div>
+                {profileImageUrl ? (
+                  <img 
+                    src={profileImageUrl} 
+                    alt="Profile" 
+                    className="w-32 h-32 rounded-full object-cover mb-4 mt-3 ml-4"
+                  />
+                ) : (
+                  <div className="w-32 h-32 rounded-full bg-gray-300 mb-4 mt-3 ml-4 flex items-center justify-center">
+                    <span className="text-gray-500 text-4xl font-bold">
+                      {name?.charAt(0)?.toUpperCase() || "U"}
+                    </span>
+                  </div>
+                )}
 
                 <p className="font-bold">{name}</p>
                 <div className="flex flex-row gap-2 justify-center">

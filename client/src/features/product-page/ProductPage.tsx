@@ -147,7 +147,7 @@ const ProductPage = () => {
             <motion.div variants={ProductAnimations.specsRow} initial = "hidden" animate = "visible" className="flex justify-between items-center flex-wrap gap-4">
               <div className="flex items-center gap-2 text-gray-600">
                 <MapPin size={18} />
-                <p>Location, Location, Location</p> 
+                <p>{car.location}</p> 
               </div>
               <div className="flex flex-wrap items-center gap-6 text-gray-600">
                 <div className="flex items-center gap-2">
@@ -177,7 +177,7 @@ const ProductPage = () => {
             <motion.div variants={ProductAnimations.description} initial = "hidden" animate = "visible">
               <h2 className="text-2xl font-semibold text-gray-900">Description</h2>
               <p className="text-gray-600 leading-relaxed mt-2">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempora voluptatibus itaque enim provident, eum architecto adipisci impedit dolorum.
+                {car.description}
               </p>
             </motion.div>
           </div>
