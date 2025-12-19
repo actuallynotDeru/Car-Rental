@@ -1,4 +1,4 @@
-import { easeOut, spring } from "framer-motion"
+import { easeOut } from "framer-motion"
 
 export const ProductAnimations = {
   // Page container
